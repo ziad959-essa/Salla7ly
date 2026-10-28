@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f2">
+  <title>إدارة صلّحلي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+  <script src="supabase-config.js" defer></script>
+  <script src="admin.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">ص</span><span>صلّحلي <small>إدارة المنصة</small></span></a>
+    <div class="topbar-actions"><button class="button secondary" id="theme-toggle" type="button" aria-label="تشغيل الوضع الليلي">الوضع الداكن</button><a class="back-link" href="index.html">العودة للموقع ←</a></div>
+  </header>
+  <main class="shell">
+    <section class="auth-card" id="auth-view">
+      <span class="eyebrow">إدارة آمنة للطلبات</span>
+      <h1 id="auth-title">تسجيل دخول الإدارة</h1>
+      <p class="muted" id="auth-description">سجل الدخول بحساب مخول كمدير في Supabase.</p>
+      <form id="auth-form">
+        <label>البريد الإلكتروني<input name="email" type="email" autocomplete="email" required placeholder="admin@example.com"></label>
+        <label>كلمة المرور<input name="password" type="password" autocomplete="current-password" required minlength="8"></label>
+        <button class="button primary" id="auth-submit" type="submit">دخول</button>
+      </form>
+      <button class="text-button" id="auth-toggle" type="button">إنشاء حساب إدارة جديد</button>
+      <p class="notice">الحساب الجديد لا يحصل على صلاحية الإدارة تلقائيًا. أنشئه ثم غيّر role إلى admin من SQL Editor حسب التعليمات في ملف SQL.</p>
+    </section>
+
+    <section id="dashboard-view" hidden>
+      <div class="page-head">
+        <div><span class="eyebrow">مساحة الإدارة</span><h1>متابعة العمليات</h1><p class="muted" id="admin-email"></p></div>
+        <button class="button secondary" id="signout-button" type="button">تسجيل الخروج</button>
+      </div>
+      <div class="metrics" aria-live="polite">
+        <article class="metric"><span>كل الطلبات</span><strong id="metric-orders">0</strong></article>
+        <article class="metric"><span>قيد المراجعة</span><strong id="metric-pending">0</strong></article>
+        <article class="metric"><span>إجمالي العمليات المدفوعة</span><strong id="metric-paid">0 ج.م</strong></article>
+        <article class="metric accent"><span>حصة الإدارة (20%)</span><strong id="metric-commission">0 ج.م</strong></article>
+      </div>
+
+      <section class="panel">
+        <div class="panel-heading"><div><h2>طلبات العملاء والعمليات</h2><p class="muted">أضف السعر النهائي وحدد طريقة الدفع وحالتها. الحصة تُحسب عند اعتماد الدفع كمكتمل.</p></div></div>
+        <form class="filters" id="filters-form">
+          <label>بحث<input id="search-input" type="search" placeholder="اسم العميل، الهاتف، الحرفة"></label>
+          <label>حالة الطلب<select id="status-filter"><option value="">كل الحالات</option><option>قيد المراجعة</option><option>تم التأكيد</option><option>قيد التنفيذ</option><option>مكتمل</option><option>ملغي</option></select></label>
+          <label>طريقة الدفع<select id="payment-filter"><option value="">كل طرق الدفع</option><option value="instapay">InstaPay</option><option value="vodafone_cash">Vodafone Cash</option></select></label>
+          <button class="button secondary" id="refresh-button" type="button">تحديث</button>
+        </form>
+        <div id="orders-list" class="record-list"></div>
+        <p class="empty" id="orders-empty" hidden>لا توجد طلبات تطابق عوامل التصفية.</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><h2>إضافة عملية يدويًا</h2><p class="muted">للعمليات التي تم الاتفاق عليها خارج الموقع.</p></div></div>
+        <form id="manual-order-form" class="manual-form">
+          <label>اسم العميل<input name="customer_name" required></label>
+          <label>رقم الهاتف<input name="phone" type="tel" required></label>
+          <label>الحرفة / الخدمة<input name="trade" required></label>
+          <label>المبلغ الإجمالي (ج.م)<input name="total_amount" type="number" min="0" step="0.01" required></label>
+          <label>طريقة الدفع<select name="payment_method"><option value="">غير محددة</option><option value="instapay">InstaPay</option><option value="vodafone_cash">Vodafone Cash</option></select></label>
+          <button class="button primary" type="submit">إضافة العملية</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><h2>طلبات الحرفيين</h2><p class="muted">مستندات الهوية مخزنة في مساحة خاصة ولا يمكن للزوار مشاهدتها.</p></div></div>
+        <div id="professionals-list" class="record-list"></div>
+        <p class="empty" id="professionals-empty" hidden>لا توجد طلبات حرفيين.</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><h2>بيانات استقبال الدفع</h2><p class="muted">تظهر بيانات التحويل للعميل بعد اختيار الوسيلة. راجع التحويل يدويًا قبل تغيير الحالة إلى مدفوع.</p></div></div>
+        <form id="payment-settings-form" class="manual-form">
+          <label>InstaPay<input name="instapay" autocomplete="off" placeholder="عنوان InstaPay أو رقم الحساب"></label>
+          <label>Vodafone Cash<input name="vodafone_cash" autocomplete="off" placeholder="رقم محفظة Vodafone Cash"></label>
+          <button class="button primary" type="submit">حفظ بيانات الدفع</button>
+        </form>
+      </section>
+    </section>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
