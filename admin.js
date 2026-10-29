@@ -41,6 +41,7 @@
   function paymentLabel(method) {
     if (method === "instapay") return "InstaPay";
     if (method === "vodafone_cash") return "Vodafone Cash";
+    if (method === "cash") return "كاش";
     return "غير محددة";
   }
 
@@ -114,8 +115,8 @@
       showToast("تعذر تحميل بيانات الدفع.");
     } else {
       const settings = settingsResult.data?.value || {};
-      byId("payment-settings-form").elements.instapay.value = settings.instapay || "";
-      byId("payment-settings-form").elements.vodafone_cash.value = settings.vodafone_cash || "";
+      byId("payment-settings-form").elements.instapay.value = settings.instapay || "01063459472";
+      byId("payment-settings-form").elements.vodafone_cash.value = settings.vodafone_cash || "01063459472";
     }
   }
 
@@ -174,6 +175,9 @@
         order.phone,
         order.address,
         order.details,
+        order.area_size_sqm ? `المساحة: ${order.area_size_sqm} م²` : "",
+        order.transaction_id ? `رقم المعاملة: ${order.transaction_id}` : "",
+        order.cash_location_details ? `موقع الدفع النقدي: ${order.cash_location_details}` : "",
         `الدفع: ${paymentLabel(order.payment_method)}`,
         new Date(order.created_at).toLocaleString("ar-EG")
       ].filter(Boolean).join(" · ");
@@ -204,10 +208,15 @@
       card.append(paid.label);
       const controls = text("div", "record-controls", "حصة الإدارة عند الدفع: 20%");
       controls.classList.add("commission-hint");
-      controls.textContent = `حصة الإدارة (20%): ${formatter.format(Number(order.total_amount || 0) * 0.2)} ج.م عند الدفع`;
+      controls.textContent = `حصة الإدارة (20%): ${formatter.format(Number(order.total_amount || 0) * 0.2)} ج.م · صافي الحرفي (80%): ${formatter.format(Number(order.total_amount || 0) * 0.8)} ج.م عند الدفع`;
       card.append(controls);
       const actions = document.createElement("div");
       actions.className = "record-actions";
+      if (order.payment_receipt_path) {
+        const receiptButton = actionButton("عرض إيصال الدفع", "view-payment-receipt");
+        receiptButton.dataset.path = order.payment_receipt_path;
+        actions.append(receiptButton);
+      }
       actions.append(actionButton("حفظ التعديلات", "save-order"));
       card.append(actions);
       host.append(card);
@@ -234,7 +243,7 @@
       info.className = "record-info";
       info.append(
         text("strong", "", `${professional.name} — ${professional.trade}`),
-        text("span", "", `${professional.phone} · ${professional.governorate}، ${professional.area} · الخبرة: ${professional.experience} · الحالة: ${professional.status}`)
+        text("span", "", `${professional.phone} · ${professional.governorate}، ${professional.area} · الخبرة: ${professional.experience} · استلام الأرباح: ${paymentLabel(professional.payout_method)} · الحالة: ${professional.status}`)
       );
       card.append(info);
       const actions = document.createElement("div");
@@ -243,6 +252,11 @@
       imageButton.dataset.path = professional.id_image_path;
       imageButton.disabled = !professional.id_image_path;
       actions.append(imageButton);
+      (professional.portfolio_paths || []).forEach((path, index) => {
+        const portfolioButton = actionButton(`معاينة العمل ${index + 1}`, "view-portfolio");
+        portfolioButton.dataset.path = path;
+        actions.append(portfolioButton);
+      });
       if (professional.status !== "مقبول") {
         const approve = actionButton("اعتماد الحرفي", "approve-professional");
         approve.dataset.professionalId = professional.id;
@@ -276,14 +290,33 @@
     await loadDashboard();
   }
 
+  async function handlePaymentReceipt(button) {
+    const { data, error } = await client.storage.from("payment-receipts")
+      .createSignedUrl(button.dataset.path, 60);
+    if (error) {
+      console.error("Could not create a private payment receipt link.", error);
+      showToast("تعذر فتح إيصال الدفع.");
+      return;
+    }
+    const link = document.createElement("a");
+    link.className = "button primary";
+    link.href = data.signedUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "فتح إيصال الدفع";
+    button.replaceWith(link);
+  }
+
   async function handleProfessionalAction(button) {
-    if (button.dataset.action === "view-id") {
+    if (button.dataset.action === "view-id" || button.dataset.action === "view-portfolio") {
+      const isPortfolio = button.dataset.action === "view-portfolio";
+      const bucket = isPortfolio ? "professional-portfolio" : "professional-ids";
       const { data, error } = await client.storage
-        .from("professional-ids")
+        .from(bucket)
         .createSignedUrl(button.dataset.path, 60);
       if (error) {
-        console.error("Could not create a private ID image link.", error);
-        showToast("تعذر فتح صورة الهوية.");
+        console.error("Could not create a private professional image link.", error);
+        showToast(isPortfolio ? "تعذر فتح صورة معرض الأعمال." : "تعذر فتح صورة الهوية.");
         return;
       }
       const link = document.createElement("a");
@@ -291,7 +324,7 @@
       link.href = data.signedUrl;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.textContent = "فتح صورة الهوية";
+      link.textContent = isPortfolio ? "فتح صورة من معرض الأعمال" : "فتح صورة الهوية";
       button.replaceWith(link);
       return;
     }
@@ -353,6 +386,7 @@
   byId("orders-list").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-action]");
     if (button?.dataset.action === "save-order") await handleOrderSave(button);
+    if (button?.dataset.action === "view-payment-receipt") await handlePaymentReceipt(button);
   });
   byId("professionals-list").addEventListener("click", async (event) => {
     const button = event.target.closest("[data-action]");

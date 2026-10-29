@@ -704,6 +704,7 @@ html[data-theme="dark"] .auth-dialog,
 html[data-theme="dark"] .support-line { border-color: #393545; background: #211f2d; color: #f4edf6; }
 html[data-theme="dark"] .directory-tools select,
 html[data-theme="dark"] .select-wrap select,
+html[data-theme="dark"] select,
 html[data-theme="dark"] .form-label input,
 html[data-theme="dark"] .form-label textarea,
 html[data-theme="dark"] .form-label select,
@@ -713,6 +714,13 @@ html[data-theme="dark"] .public-review { border-color: #454051; background: #292
 html[data-theme="dark"] .directory-search input,
 html[data-theme="dark"] .search-field input,
 html[data-theme="dark"] .search-field select { color: #f4edf6; }
+html[data-theme="dark"] select { background-color: #171622; color: #f4edf6; }
+html[data-theme="dark"] select option { background-color: #211f2d; color: #f4edf6; }
+html[data-theme="dark"] .request-payment-section,
+html[data-theme="dark"] .artisan-order-card { border-color: #393545; background: #211f2d; color: #f4edf6; }
+html[data-theme="dark"] .payment-intro,
+html[data-theme="dark"] .payment-recipient,
+html[data-theme="dark"] .request-live-status { color: #c0b5c8; }
 html[data-theme="dark"] .craft-ribbon { border-color: #393545; }
 html[data-theme="dark"] .craft-pill { border-color: #454051; background: #211f2d; color: #eee7f4; }
 html[data-theme="dark"] .craft-all,
@@ -762,6 +770,19 @@ html[dir="ltr"] .hero-photo-note { right: 50%; }
 .availability-actions { display: flex; flex-wrap: wrap; gap: 7px; }
 .availability-actions .button { min-height: 34px; }
 .availability-dialog > .form-submit { width: 100%; }
+.request-payment-section { margin: 18px 0; padding: 16px; border: 1px solid #e7eae3; border-radius: 9px; background: #f9faf7; }
+.request-payment-section h3 { margin: 0 0 5px; font-size: 15px; }
+.payment-intro, .payment-recipient { margin: 0 0 12px; color: #657369; font-size: 11px; }
+.payment-recipient { padding: 10px 12px; border-radius: 6px; background: rgba(23, 78, 59, .08); color: #174e3b; font-size: 13px; font-weight: 700; direction: ltr; text-align: center; }
+.payment-conditional-fields[hidden] { display: none; }
+.request-live-status { min-height: 24px; padding: 8px 0; color: #52625a; font-size: 11px; }
+.artisan-dashboard { padding-top: 40px; padding-bottom: 70px; }
+.artisan-auth-panel { max-width: 430px; margin: 22px 0; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--white); }
+.artisan-orders { display: grid; gap: 12px; }
+.artisan-order-card { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 9px; background: var(--white); }
+.artisan-order-card > span { color: var(--ink-soft); font-size: 11px; }
+.auth-mode-toggle { width: 100%; margin-top: 10px; border: 0; background: transparent; cursor: pointer; }
+html[data-theme="dark"] .artisan-auth-panel { border-color: #393545; background: #211f2d; color: #f4edf6; }
 
 @media (max-width: 1000px) {
   .header-actions { gap: 7px; }

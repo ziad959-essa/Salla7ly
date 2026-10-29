@@ -252,7 +252,34 @@
     "تُحفظ بيانات الحرفي وصورة الهوية في مساحة خاصة لا يراها إلا المدير المخول.": "Professional details and ID images are stored privately and are only accessible to authorized admins.",
     "وضع تجريبي محلي: لا ترفع بيانات أو صور هوية حقيقية قبل إعداد Supabase.": "Local demo: do not upload real personal details or ID images before configuring Supabase.",
     "بيانات الهوية مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير.": "ID images are stored privately and restricted to administrators.",
-    "وضع تجريبي محلي: بيانات وصور الهوية لا تُرفع إلى خادم.": "Local demo: personal details and ID images are not uploaded to a server."
+    "وضع تجريبي محلي: بيانات وصور الهوية لا تُرفع إلى خادم.": "Local demo: personal details and ID images are not uploaded to a server.",
+    "طريقة الدفع": "Payment method",
+    "اختار وسيلة الدفع المناسبة. التحويل يتم يدويًا بعد تأكيد السعر.": "Choose a payment option. Transfers are manual after the price is confirmed.",
+    "طريقة الدفع المفضلة": "Preferred payment method",
+    "اختار طريقة الدفع": "Choose a payment method",
+    "كاش عند تقديم الخدمة": "Cash when service is provided",
+    "رفع صورة الإيصال (اختياري إذا كتبت رقم المعاملة)": "Upload receipt (optional if you enter a transaction ID)",
+    "أو رقم Transaction ID": "Or transaction ID",
+    "اكتب رقم المعاملة": "Enter the transaction ID",
+    "تفاصيل مكان الدفع النقدي": "Cash collection location details",
+    "اكتب العنوان بالتفصيل وأقرب علامة مميزة لاستلام الخدمة نقدًا": "Enter the full address and a nearby landmark for cash payment",
+    "المساحة بالمتر المربع": "Area size in square meters",
+    "صور معرض الأعمال (اختياري)": "Portfolio photos (optional)",
+    "يمكنك اختيار حتى 5 صور، بحد أقصى 5 ميجابايت للصورة.": "Select up to 5 photos, with a 5 MB maximum per image.",
+    "طريقة استلام الأرباح": "Payout method",
+    "اختار طريقة استلام الأرباح": "Choose a payout method",
+    "كاش": "Cash",
+    "الرقم القومي": "National ID",
+    "14 رقمًا": "14 digits",
+    "كود التحقق المرسل برسالة SMS": "SMS verification code",
+    "إرسال كود التحقق": "Send verification code",
+    "تأكيد الكود": "Verify code",
+    "تسجيل دخول العميل": "Customer login",
+    "إنشاء حساب عميل": "Create customer account",
+    "سنرسل كود تحقق إلى رقم موبايلك.": "We will send a verification code to your phone.",
+    "لديك حساب؟ تسجيل الدخول": "Already have an account? Log in",
+    "حساب جديد؟ سجّل الآن": "New here? Sign up",
+    "حساب الحرفي": "Professional account"
   });
 
   function localized(value) {
@@ -349,14 +376,14 @@
     "سوهاج": ["مدينة سوهاج", "أخميم", "جرجا", "طهطا", "المراغة", "البلينا", "المنشأة", "دار السلام", "ساقلتة", "طما"]
   };
 
-  const pageNames = new Set(["home", "services", "request", "join"]);
+  const pageNames = new Set(["home", "services", "request", "join", "artisan"]);
+  const supportPhone = "01068076603";
+  const paymentPhone = "01063459472";
   const storageKeys = {
     orders: "salla7ly-v2-orders",
     workers: "salla7ly-v2-worker-applications",
     messages: "salla7ly-v2-messages",
-    reviews: "salla7ly-v2-reviews",
-    support: "salla7ly-v2-support",
-    profile: "salla7ly-v2-profile"
+    reviews: "salla7ly-v2-reviews"
   };
   const nav = document.querySelector(".main-nav");
   const menuToggle = document.querySelector(".menu-toggle");
@@ -504,6 +531,392 @@
     other.value = "";
     other.hidden = true;
     other.required = false;
+  }
+
+  function createFormField(labelText, name, type, attributes = {}) {
+    const label = document.createElement("label");
+    label.className = "form-label";
+    label.append(document.createTextNode(labelText));
+    const input = document.createElement(type === "textarea" ? "textarea" : "input");
+    if (type !== "textarea") input.type = type;
+    input.name = name;
+    Object.entries(attributes).forEach(([key, value]) => {
+      if (key === "required") input.required = Boolean(value);
+      else if (key === "hidden") input.hidden = Boolean(value);
+      else input.setAttribute(key, String(value));
+    });
+    label.append(input);
+    return { label, input };
+  }
+
+  function setupRequestExperience() {
+    const form = byId("request-form");
+    byId("payment-method").closest(".form-label").remove();
+    byId("payment-instructions").remove();
+
+    const section = document.createElement("section");
+    section.className = "request-payment-section";
+    const heading = document.createElement("h3");
+    heading.textContent = "طريقة الدفع";
+    const intro = document.createElement("p");
+    intro.className = "payment-intro";
+    intro.textContent = "اختار وسيلة الدفع المناسبة. التحويل يتم يدويًا بعد تأكيد السعر.";
+    section.append(heading, intro);
+    const methodLabel = document.createElement("label");
+    methodLabel.className = "form-label";
+    methodLabel.append(document.createTextNode("طريقة الدفع المفضلة"));
+    const method = document.createElement("select");
+    method.id = "payment-method";
+    method.name = "payment_method";
+    method.required = true;
+    [
+      ["اختار طريقة الدفع", ""],
+      ["InstaPay", "instapay"],
+      ["Vodafone Cash", "vodafone_cash"],
+      ["كاش عند تقديم الخدمة", "cash"]
+    ].forEach(([label, value]) => method.add(new Option(label, value)));
+    methodLabel.append(method);
+    section.append(methodLabel);
+
+    const digitalFields = document.createElement("div");
+    digitalFields.id = "digital-payment-fields";
+    digitalFields.className = "payment-conditional-fields";
+    digitalFields.hidden = true;
+    const recipient = document.createElement("p");
+    recipient.id = "payment-recipient";
+    recipient.className = "payment-recipient";
+    digitalFields.append(recipient);
+    const receipt = createFormField("رفع صورة الإيصال (اختياري إذا كتبت رقم المعاملة)", "payment_receipt", "file", {
+      accept: "image/jpeg,image/png,image/webp,application/pdf"
+    });
+    receipt.input.id = "payment-receipt";
+    const transaction = createFormField("أو رقم Transaction ID", "transaction_id", "text", {
+      autocomplete: "off",
+      placeholder: "اكتب رقم المعاملة"
+    });
+    transaction.input.id = "transaction-id";
+    digitalFields.append(receipt.label, transaction.label);
+
+    const cashFields = document.createElement("div");
+    cashFields.id = "cash-payment-fields";
+    cashFields.className = "payment-conditional-fields";
+    cashFields.hidden = true;
+    const cashLocation = createFormField("تفاصيل مكان الدفع النقدي", "cash_location_details", "textarea", {
+      rows: 3,
+      placeholder: "اكتب العنوان بالتفصيل وأقرب علامة مميزة لاستلام الخدمة نقدًا"
+    });
+    cashLocation.input.id = "cash-location-details";
+    cashFields.append(cashLocation.label);
+    section.append(digitalFields, cashFields);
+    form.querySelector(".form-submit").before(section);
+
+    const sqm = createFormField("المساحة بالمتر المربع", "area_size_sqm", "number", {
+      min: "0.1",
+      step: "0.1",
+      inputmode: "decimal",
+      placeholder: "مثال: 45"
+    });
+    sqm.input.id = "area-size-sqm";
+    sqm.label.hidden = true;
+    byId("request-service-options").closest(".form-label").after(sqm.label);
+
+    method.addEventListener("change", updatePaymentInstructions);
+    transaction.input.addEventListener("input", updatePaymentInstructions);
+    receipt.input.addEventListener("change", updatePaymentInstructions);
+    byId("request-trade").addEventListener("change", (event) => {
+      const needsArea = ["سيراميك وبلاط", "دهانات ونقاشة"].includes(event.target.value);
+      sqm.label.hidden = !needsArea;
+      sqm.input.required = needsArea;
+      if (!needsArea) sqm.input.value = "";
+    });
+
+    const liveStatus = document.createElement("p");
+    liveStatus.id = "request-live-status";
+    liveStatus.className = "request-live-status";
+    liveStatus.setAttribute("aria-live", "polite");
+    byId("availability-description").after(liveStatus);
+  }
+
+  function setupJoinEnhancements() {
+    const idLabel = byId("id-upload").closest(".form-label");
+    const portfolio = createFormField("صور معرض الأعمال (اختياري)", "portfolio_images", "file", {
+      accept: "image/jpeg,image/png,image/webp",
+      multiple: true
+    });
+    portfolio.input.id = "portfolio-upload";
+    portfolio.label.append(textElement("small", "upload-help", "يمكنك اختيار حتى 5 صور، بحد أقصى 5 ميجابايت للصورة."));
+    idLabel.after(portfolio.label);
+
+    const payoutLabel = document.createElement("label");
+    payoutLabel.className = "form-label";
+    payoutLabel.append(document.createTextNode("طريقة استلام الأرباح"));
+    const payout = document.createElement("select");
+    payout.name = "payout_method";
+    payout.required = true;
+    [
+      ["اختار طريقة استلام الأرباح", ""],
+      ["Vodafone Cash", "vodafone_cash"],
+      ["InstaPay", "instapay"],
+      ["كاش", "cash"]
+    ].forEach(([label, value]) => payout.add(new Option(label, value)));
+    payoutLabel.append(payout);
+    byId("join-form").querySelector(".checkbox-label").before(payoutLabel);
+  }
+
+  function setupCustomerAuth() {
+    const dialog = byId("auth-dialog");
+    const form = byId("auth-form");
+    const nameInput = form.elements.name;
+    const phoneInput = form.elements.phone;
+    const nationalId = createFormField("الرقم القومي", "national_id", "text", {
+      inputmode: "numeric",
+      pattern: "[0-9]{14}",
+      maxlength: "14",
+      placeholder: "14 رقمًا"
+    });
+    nationalId.input.required = true;
+    phoneInput.closest("label").after(nationalId.label);
+
+    const code = createFormField("كود التحقق المرسل برسالة SMS", "otp", "text", {
+      inputmode: "numeric",
+      autocomplete: "one-time-code",
+      pattern: "[0-9]{6}",
+      maxlength: "6",
+      placeholder: "000000"
+    });
+    code.input.hidden = true;
+    code.label.hidden = true;
+    code.input.required = false;
+    form.querySelector(".form-submit").before(code.label);
+    const modeButton = document.createElement("button");
+    modeButton.type = "button";
+    modeButton.className = "text-link auth-mode-toggle";
+    modeButton.id = "auth-mode-toggle";
+    form.after(modeButton);
+    const submit = form.querySelector(".form-submit");
+    let mode = "signup";
+    let otpSent = false;
+
+    function setMode(nextMode) {
+      mode = nextMode;
+      otpSent = false;
+      nameInput.required = mode === "signup";
+      nationalId.input.required = mode === "signup";
+      nameInput.closest("label").hidden = mode !== "signup";
+      nationalId.label.hidden = mode !== "signup";
+      code.label.hidden = true;
+      code.input.hidden = true;
+      code.input.required = false;
+      submit.textContent = localized("إرسال كود التحقق");
+      byId("auth-title").textContent = localized(mode === "signup" ? "إنشاء حساب عميل" : "تسجيل دخول العميل");
+      dialog.querySelector(".auth-description").textContent = localized("سنرسل كود تحقق إلى رقم موبايلك.");
+      modeButton.textContent = localized(mode === "signup" ? "لديك حساب؟ تسجيل الدخول" : "حساب جديد؟ سجّل الآن");
+    }
+
+    function authPhone() {
+      const value = phoneInput.value.trim();
+      return value.startsWith("+") ? value : value.startsWith("0") ? `+20${value.slice(1)}` : `+20${value}`;
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      if (!supabaseConfigured) {
+        showToast("فعّل إعدادات Supabase ومزوّد SMS لتسجيل الدخول برقم الموبايل.");
+        return;
+      }
+      if (!otpSent) {
+        const options = { shouldCreateUser: mode === "signup" };
+        if (mode === "signup") {
+          options.data = {
+            full_name: nameInput.value.trim(),
+            national_id: nationalId.input.value.trim()
+          };
+        }
+        const { error } = await supabaseClient.auth.signInWithOtp({ phone: authPhone(), options });
+        if (error) {
+          console.error("Could not send the customer verification code.", error);
+          showToast(error.message || "تعذر إرسال كود التحقق.");
+          return;
+        }
+        otpSent = true;
+        code.label.hidden = false;
+        code.input.hidden = false;
+        code.input.required = true;
+        submit.textContent = "تأكيد الكود";
+        code.input.focus();
+        showToast("تم إرسال كود التحقق إلى موبايلك.");
+        return;
+      }
+      const { error } = await supabaseClient.auth.verifyOtp({
+        phone: authPhone(),
+        token: code.input.value.trim(),
+        type: "sms"
+      });
+      if (error) {
+        console.error("Could not verify the customer code.", error);
+        showToast(error.message || "كود التحقق غير صحيح.");
+        return;
+      }
+      form.reset();
+      dialog.close();
+      showToast(mode === "signup" ? "تم إنشاء حساب العميل وتأكيد رقم الموبايل." : "تم تسجيل الدخول بنجاح.");
+    });
+    modeButton.addEventListener("click", () => setMode(mode === "signup" ? "login" : "signup"));
+    document.querySelectorAll("[data-auth]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setMode(button.dataset.auth === "login" ? "login" : "signup");
+        dialog.showModal();
+      });
+    });
+
+    setMode("signup");
+    dialog.querySelector(".privacy-copy").textContent = "تسجيل الدخول متاح عبر كود SMS. يلزم تفعيل Phone Auth في إعدادات Supabase.";
+  }
+
+  function setupArtisanDashboard() {
+    const section = document.createElement("section");
+    section.className = "page-section inner-page";
+    section.id = "page-artisan";
+    section.dataset.page = "artisan";
+    section.hidden = true;
+    section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل المسجل بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" pattern="01[0-2,5]{1}[0-9]{8}" placeholder="01xxxxxxxxx" required></label><button class="button button-primary" id="artisan-send-code" type="button">إرسال كود SMS</button><label class="form-label" id="artisan-code-label" hidden>كود التحقق<input id="artisan-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></label><button class="button button-primary" id="artisan-verify-code" type="button" hidden>تأكيد الدخول</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
+    document.querySelector("main").append(section);
+    const link = document.createElement("a");
+    link.className = "nav-link";
+    link.href = "#artisan";
+    link.dataset.pageLink = "artisan";
+    link.textContent = "حساب الحرفي";
+    nav.append(link);
+
+    const dialog = document.createElement("dialog");
+    dialog.className = "auth-dialog";
+    dialog.id = "artisan-accept-dialog";
+    dialog.innerHTML = '<button type="button" class="dialog-close" data-dialog-close aria-label="إغلاق">×</button><div class="eyebrow">تأكيد استلام الطلب</div><h2>وقت الوصول المتوقع</h2><form id="artisan-accept-form"><label class="form-label">الوقت بالدقائق<input name="arrival_minutes" type="number" min="1" max="1440" step="1" required placeholder="مثال: 30"></label><button class="button button-primary form-submit" type="submit">قبول الطلب</button></form>';
+    document.body.append(dialog);
+    let acceptedMatchId = "";
+
+    async function loadMatches() {
+      const host = byId("artisan-orders");
+      const { data, error } = await supabaseClient.from("service_order_matches")
+        .select("id, status, service_orders(id, trade, services, governorate, area, address, details, cash_location_details, area_size_sqm, payment_method, created_at, status, estimated_arrival_minutes)")
+        .order("created_at", { ascending: false });
+      if (error) {
+        console.error("Could not load matching service orders.", error);
+        showToast("تعذر تحميل الطلبات المطابقة.");
+        return;
+      }
+      host.replaceChildren();
+      if (!data.length) host.append(textElement("p", "empty-state", "لا توجد طلبات مطابقة لمنطقتك وتخصصك حاليًا."));
+      data.forEach((match) => {
+        const order = match.service_orders;
+        if (!order) return;
+        const card = document.createElement("article");
+        card.className = "artisan-order-card";
+        const services = Array.isArray(order.services) ? order.services.join("، ") : "";
+        card.append(
+          textElement("strong", "", `${order.trade} — ${services}`),
+          textElement("span", "", `${order.governorate}، ${order.area} · ${order.address}`),
+          textElement("span", "", [order.details, order.cash_location_details, order.area_size_sqm ? `المساحة ${order.area_size_sqm} م²` : ""].filter(Boolean).join(" · "))
+        );
+        if (match.status === "matched") {
+          const accept = document.createElement("button");
+          accept.type = "button";
+          accept.className = "button button-primary";
+          accept.textContent = "قبول الطلب";
+          accept.addEventListener("click", () => {
+            acceptedMatchId = match.id;
+            dialog.showModal();
+          });
+          card.append(accept);
+        } else if (match.status === "accepted") {
+          card.append(textElement("span", "record-status", `تم قبول الطلب · الوصول خلال ${order.estimated_arrival_minutes || "—"} دقيقة`));
+        } else {
+          card.append(textElement("span", "record-status", "تم إسناد الطلب إلى حرفي آخر."));
+        }
+        host.append(card);
+      });
+      host.hidden = false;
+    }
+
+    byId("artisan-send-code").addEventListener("click", async () => {
+      if (!supabaseConfigured) {
+        showToast("فعّل إعدادات Supabase ومزوّد SMS أولًا.");
+        return;
+      }
+      const phone = byId("artisan-phone").value.trim();
+      if (!byId("artisan-phone").reportValidity()) return;
+      const formattedPhone = phone.startsWith("+") ? phone : `+20${phone.slice(1)}`;
+      const { error } = await supabaseClient.auth.signInWithOtp({ phone: formattedPhone, options: { shouldCreateUser: true } });
+      if (error) {
+        console.error("Could not send the artisan verification code.", error);
+        showToast(error.message || "تعذر إرسال كود الدخول.");
+        return;
+      }
+      byId("artisan-code-label").hidden = false;
+      byId("artisan-verify-code").hidden = false;
+      showToast("تم إرسال كود الدخول.");
+    });
+    byId("artisan-verify-code").addEventListener("click", async () => {
+      const phone = byId("artisan-phone").value.trim();
+      const formattedPhone = phone.startsWith("+") ? phone : `+20${phone.slice(1)}`;
+      const { error } = await supabaseClient.auth.verifyOtp({
+        phone: formattedPhone,
+        token: byId("artisan-code").value.trim(),
+        type: "sms"
+      });
+      if (error) {
+        console.error("Could not verify the artisan code.", error);
+        showToast(error.message || "كود الدخول غير صحيح.");
+        return;
+      }
+      const { data: claimed, error: claimError } = await supabaseClient.rpc("claim_professional_account");
+      if (claimError) {
+        console.error("Could not link the verified artisan account.", claimError);
+        showToast("تعذر ربط الحساب الحرفي.");
+        return;
+      }
+      if (!claimed) {
+        const { error: signOutError } = await supabaseClient.auth.signOut();
+        if (signOutError) console.error("Could not clear the unclaimed artisan session.", signOutError);
+        showToast("لم نعثر على طلب حرفي معتمد بهذا الرقم.");
+        return;
+      }
+      byId("artisan-send-code").hidden = true;
+      byId("artisan-code-label").hidden = true;
+      byId("artisan-verify-code").hidden = true;
+      byId("artisan-signout").hidden = false;
+      await loadMatches();
+    });
+    byId("artisan-signout").addEventListener("click", async () => {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) {
+        console.error("Could not sign out the artisan.", error);
+        showToast("تعذر تسجيل الخروج.");
+        return;
+      }
+      byId("artisan-orders").hidden = true;
+      byId("artisan-send-code").hidden = false;
+      byId("artisan-signout").hidden = true;
+    });
+    byId("artisan-accept-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!event.currentTarget.reportValidity()) return;
+      const arrivalMinutes = Number(new FormData(event.currentTarget).get("arrival_minutes"));
+      const { error } = await supabaseClient.rpc("accept_service_order", {
+        match_id: acceptedMatchId,
+        arrival_minutes: arrivalMinutes
+      });
+      if (error) {
+        console.error("Could not accept the matching service order.", error);
+        showToast(error.message || "تعذر قبول الطلب.");
+        return;
+      }
+      dialog.close();
+      event.currentTarget.reset();
+      showToast("تم قبول الطلب وإرسال وقت الوصول للعميل.");
+      await loadMatches();
+    });
   }
 
   function iconMark(icon, color) {
@@ -724,17 +1137,14 @@
   async function findRemoteAvailableWorkers(trade, governorate, area) {
     const { data, error } = await supabaseClient.from("available_professionals")
       .select("id, name, phone, trade, governorate, area")
-      .eq("trade", trade);
+      .eq("trade", trade)
+      .eq("governorate", governorate)
+      .eq("area", area);
     if (error) {
       console.error("Could not find approved professionals in Supabase.", error);
       return null;
     }
-    return (data || [])
-      .filter((worker) =>
-        normalizeLocation(worker.governorate) === normalizeLocation(governorate)
-        && normalizeLocation(worker.area) === normalizeLocation(area)
-      )
-      .map(({ id, name, phone, trade: workerTrade }) => ({ id, name, phone, trade: workerTrade }));
+    return (data || []).map(({ id, name, phone, trade: workerTrade }) => ({ id, name, phone, trade: workerTrade }));
   }
 
   function showAvailabilityResult(workers, order) {
@@ -748,6 +1158,10 @@
     description.textContent = localized(workers.length
       ? "لقينا حرفي معتمد في نفس منطقتك، تقدر تتواصل معاه مباشرة."
       : "لسه مفيش حرفي معتمد قريب منك. طلبك وصل لصاحب الموقع وهيتابع معاك.");
+    byId("request-live-status").textContent = order.id
+      ? `رقم الطلب: ${order.id} — سيتم تحديث الحالة ووقت الوصول هنا تلقائيًا.`
+      : "سيتم تحديث حالة الطلب عند توفر فني مناسب.";
+    if (order.trackingToken) void subscribeToOrderTracking(order.trackingToken);
 
     workers.forEach((worker) => {
       const card = document.createElement("article");
@@ -797,6 +1211,8 @@
       ["المحافظة", localized(worker.governorate)],
       ["المنطقة", localized(worker.area)],
       ["العنوان بالتفصيل", worker.address],
+      ["صور معرض الأعمال", (worker.portfolioFiles || []).join("، ")],
+      ["طريقة استلام الأرباح", worker.payoutMethod || ""],
       ["تاريخ التقديم", worker.createdAt ? new Date(worker.createdAt).toLocaleString(document.documentElement.lang === "en" ? "en" : "ar-EG") : ""]
     ].forEach(([label, value]) => {
       const row = document.createElement("div");
@@ -850,10 +1266,10 @@
 
   function renderDashboard() {
     renderRequests();
-    const support = readStore(storageKeys.support, "");
-    byId("support-number-label").textContent = support || "يُضاف من إعدادات الموقع";
-    byId("footer-support-number").textContent = support || "يُضاف من إعدادات الموقع";
-    byId("support-call").href = support ? `tel:${support.replace(/[^\d+]/g, "")}` : "#support";
+    const support = supportPhone;
+    byId("support-number-label").textContent = support;
+    byId("footer-support-number").textContent = support;
+    byId("support-call").href = `tel:${support.replace(/[^\d+]/g, "")}`;
     byId("support-settings").elements.phone.value = support;
   }
 
@@ -875,31 +1291,134 @@
     return true;
   }
 
-  async function updatePaymentInstructions() {
+  function updatePaymentInstructions() {
     const method = byId("payment-method").value;
-    const instructions = byId("payment-instructions");
-    if (!method) {
-      instructions.textContent = "الدفع يتم يدويًا بعد تأكيد السعر؛ لا يتم خصم أي مبلغ تلقائيًا.";
-      return;
+    const digital = method === "instapay" || method === "vodafone_cash";
+    byId("digital-payment-fields").hidden = !digital;
+    byId("cash-payment-fields").hidden = method !== "cash";
+    byId("cash-location-details").required = method === "cash";
+    const hasTransactionId = Boolean(byId("transaction-id").value.trim());
+    const hasReceipt = Boolean(byId("payment-receipt").files.length);
+    byId("payment-receipt").required = digital && !hasTransactionId && !hasReceipt;
+    byId("transaction-id").required = false;
+    if (digital) {
+      const methodName = method === "instapay" ? "InstaPay" : "Vodafone Cash";
+      const account = paymentAccounts[method] || paymentPhone;
+      byId("payment-recipient").textContent = `${methodName}: ${account}`;
     }
-    if (!supabaseConfigured) {
-      instructions.textContent = "بيانات التحويل ستظهر بعد إعداد Supabase وحفظها من لوحة الإدارة.";
-      return;
-    }
+  }
+
+  let paymentAccounts = { instapay: paymentPhone, vodafone_cash: paymentPhone };
+  let activeTrackingChannel = null;
+
+  async function loadPaymentAccounts() {
+    if (!supabaseConfigured) return;
     const { data, error } = await supabaseClient.from("site_settings")
       .select("value")
       .eq("key", "payment_accounts")
       .maybeSingle();
     if (error) {
-      console.error("Could not load payment instructions.", error);
-      instructions.textContent = "تعذر تحميل بيانات الدفع حاليًا. تواصل مع الإدارة قبل التحويل.";
+      console.error("Could not load payment recipient numbers.", error);
+      showToast("تعذر تحميل بيانات الدفع؛ سيتم عرض الرقم الافتراضي.");
       return;
     }
-    const settings = data?.value || {};
-    const recipient = settings[method];
-    instructions.textContent = recipient
-      ? `بيانات التحويل: ${recipient}. حوّل بعد تأكيد السعر من الإدارة فقط؛ الدفع غير آلي.`
-      : "لم تُضف الإدارة بيانات التحويل لهذه الوسيلة بعد. تواصل معها قبل الدفع.";
+    paymentAccounts = {
+      instapay: data?.value?.instapay || paymentPhone,
+      vodafone_cash: data?.value?.vodafone_cash || paymentPhone
+    };
+    updatePaymentInstructions();
+  }
+
+  async function subscribeToOrderTracking(trackingToken) {
+    if (!supabaseConfigured || !trackingToken) return;
+    if (activeTrackingChannel) {
+      const status = await supabaseClient.removeChannel(activeTrackingChannel);
+      if (status === "error") console.error("Could not close the previous order tracking channel.");
+    }
+    let isSubscribed = false;
+    activeTrackingChannel = supabaseClient.channel(`order-tracking:${trackingToken}`, {
+      config: { private: false }
+    }).on("broadcast", { event: "order_updated" }, ({ payload }) => {
+      renderTrackingUpdate(payload);
+    }).subscribe((status) => {
+      if (status === "SUBSCRIBED" && !isSubscribed) {
+        isSubscribed = true;
+        supabaseClient.rpc("get_order_tracking", { p_tracking_token: trackingToken }).then(({ data, error }) => {
+          if (error) {
+            console.error("Could not load the current order tracking status.", error);
+            return;
+          }
+          if (data) renderTrackingUpdate(data);
+        });
+      }
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error("The real-time order tracking channel failed.", status);
+        showToast("تعذر تفعيل التحديث الفوري للطلب.");
+      }
+    });
+  }
+
+  function renderTrackingUpdate(payload) {
+    const eta = payload?.estimated_arrival_minutes;
+    const status = payload?.status || "قيد المراجعة";
+    byId("request-live-status").textContent = document.documentElement.lang === "en"
+      ? eta
+        ? `Order accepted — estimated arrival in ${eta} minutes.`
+        : `Order status: ${localized(status)}`
+      : eta
+        ? `تم قبول طلبك — وقت الوصول المتوقع خلال ${eta} دقيقة.`
+        : `حالة الطلب: ${status}`;
+  }
+
+  function fileExtension(file) {
+    if (file.type === "image/png") return "png";
+    if (file.type === "image/webp") return "webp";
+    if (file.type === "application/pdf") return "pdf";
+    return "jpg";
+  }
+
+  async function uploadOrderReceipt(file, trackingToken) {
+    if (!file) return "";
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+    if (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024) {
+      showToast("الإيصال يجب أن يكون صورة أو PDF بحجم لا يتجاوز 5 ميجابايت.");
+      return null;
+    }
+    if (!supabaseConfigured) return file.name;
+    const path = `${trackingToken}/${crypto.randomUUID()}.${fileExtension(file)}`;
+    const { error } = await supabaseClient.storage.from("payment-receipts")
+      .upload(path, file, { contentType: file.type, upsert: false });
+    if (error) {
+      console.error("Could not upload the payment receipt.", error);
+      showToast("تعذر رفع إيصال الدفع. حاول مرة أخرى.");
+      return null;
+    }
+    return path;
+  }
+
+  async function uploadPortfolioFiles(files, professionalId) {
+    if (!files.length) return [];
+    if (files.length > 5 || files.some((file) =>
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type)
+      || file.size > 5 * 1024 * 1024
+    )) {
+      showToast("معرض الأعمال يقبل حتى 5 صور JPG أو PNG أو WebP، بحد أقصى 5 ميجابايت للصورة.");
+      return null;
+    }
+    if (!supabaseConfigured) return [];
+    const paths = [];
+    for (const file of files) {
+      const path = `${professionalId}/${crypto.randomUUID()}.${fileExtension(file)}`;
+      const { error } = await supabaseClient.storage.from("professional-portfolio")
+        .upload(path, file, { contentType: file.type, upsert: false });
+      if (error) {
+        console.error("Could not upload a professional portfolio image.", error);
+        showToast("تعذر رفع صور معرض الأعمال. حاول مرة أخرى.");
+        return null;
+      }
+      paths.push(path);
+    }
+    return paths;
   }
 
   document.addEventListener("click", (event) => {
@@ -1020,8 +1539,13 @@
     if (!form.reportValidity()) return;
     const data = new FormData(form);
     const area = data.get("area") === "__other__" ? data.get("area_other") : data.get("area");
+    const trackingToken = crypto.randomUUID();
+    const receiptFile = data.get("payment_receipt");
+    const receiptPath = await uploadOrderReceipt(receiptFile?.size ? receiptFile : null, trackingToken);
+    if (receiptPath === null) return;
     const order = {
       id: crypto.randomUUID(),
+      trackingToken,
       trade: data.get("trade"),
       service: data.getAll("services"),
       governorate: data.get("governorate"),
@@ -1030,6 +1554,11 @@
       details: data.get("details"),
       name: data.get("name"),
       phone: data.get("phone"),
+      paymentMethod: data.get("payment_method"),
+      paymentReceipt: receiptPath,
+      transactionId: data.get("transaction_id"),
+      cashLocationDetails: data.get("cash_location_details"),
+      areaSizeSqm: data.get("area_size_sqm") || null,
       matchedWorkers: findAvailableWorkers(data.get("trade"), data.get("governorate"), area),
       status: "قيد المراجعة",
       createdAt: new Date().toISOString()
@@ -1044,7 +1573,12 @@
         area: order.area,
         address: order.address,
         details: order.details || "",
-        payment_method: data.get("payment_method") || null
+        payment_method: order.paymentMethod,
+        payment_receipt_path: supabaseConfigured ? receiptPath || null : null,
+        transaction_id: order.transactionId || null,
+        cash_location_details: order.cashLocationDetails || null,
+        area_size_sqm: order.areaSizeSqm,
+        tracking_token: order.trackingToken
       });
       if (error) {
         console.error("Could not submit the service order to Supabase.", error);
@@ -1059,6 +1593,11 @@
     }
     form.reset();
     renderRequestServices("");
+    byId("area-size-sqm").value = "";
+    byId("area-size-sqm").closest(".form-label").hidden = true;
+    byId("payment-receipt").required = false;
+    byId("transaction-id").required = false;
+    updatePaymentInstructions();
     resetDistrictSelect("request-form", "request-area");
     renderDashboard();
     navigate("home");
@@ -1099,11 +1638,16 @@
       area: data.get("area") === "__other__" ? data.get("area_other") : data.get("area"),
       address: data.get("address"),
       idFile: data.get("id-image").name,
+      payoutMethod: data.get("payout_method"),
+      portfolioFiles: [...data.getAll("portfolio_images")].filter((file) => file.size > 0).map((file) => file.name),
       idImage,
       status: "قيد المراجعة",
       createdAt: new Date().toISOString()
     };
     if (supabaseConfigured) {
+      const portfolioFiles = [...data.getAll("portfolio_images")].filter((file) => file.size > 0);
+      const portfolioPaths = await uploadPortfolioFiles(portfolioFiles, workerId);
+      if (portfolioPaths === null) return;
       const file = data.get("id-image");
       const extension = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
       const imagePath = `${workerId}.${extension}`;
@@ -1124,7 +1668,9 @@
         governorate: worker.governorate,
         area: worker.area,
         address: worker.address,
-        id_image_path: imagePath
+        id_image_path: imagePath,
+        portfolio_paths: portfolioPaths,
+        payout_method: worker.payoutMethod
       });
       if (error) {
         console.error("Could not submit the professional application to Supabase.", error);
@@ -1201,24 +1747,10 @@
     event.preventDefault();
     if (event.currentTarget.reportValidity()) saveMessage(event.currentTarget);
   });
-  byId("payment-method").addEventListener("change", updatePaymentInstructions);
   byId("support-settings").addEventListener("submit", (event) => {
     event.preventDefault();
-    const phone = new FormData(event.currentTarget).get("phone").trim();
-    if (!writeStore(storageKeys.support, phone)) return;
-    renderDashboard();
-    showToast("تم تحديث رقم الدعم الفني.");
+    showToast(`رقم الدعم الفني: ${supportPhone}`);
   });
-  byId("auth-form").addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!event.currentTarget.reportValidity()) return;
-    const data = new FormData(event.currentTarget);
-    if (!writeStore(storageKeys.profile, { name: data.get("name"), phone: data.get("phone") })) return;
-    event.currentTarget.closest("dialog").close();
-    showToast("تم حفظ بيانات الحساب على هذا المتصفح.");
-    event.currentTarget.reset();
-  });
-  document.querySelectorAll("[data-auth]").forEach((button) => button.addEventListener("click", () => byId("auth-dialog").showModal()));
   byId("language-toggle").addEventListener("click", () => {
     document.documentElement.lang = document.documentElement.lang === "ar" ? "en" : "ar";
     localizePage();
@@ -1243,13 +1775,20 @@
     ? "بيانات الطلب تُرسل إلى قاعدة بيانات Supabase."
     : "وضع تجريبي: أضف إعدادات Supabase لإرسال الطلبات إلى قاعدة البيانات.";
   document.querySelector(".join-quote").textContent = supabaseConfigured
-    ? "تُحفظ بيانات الحرفي وصورة الهوية في مساحة خاصة لا يراها إلا المدير المخول."
+    ? "تُحفظ بيانات الحرفي وصورة الهوية ومعرض الأعمال في مساحة خاصة لا يراها إلا المدير المخول."
     : "وضع تجريبي محلي: لا ترفع بيانات أو صور هوية حقيقية قبل إعداد Supabase.";
   document.querySelector("#join-form .privacy-copy").textContent = supabaseConfigured
-    ? "بيانات الهوية مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير."
+    ? "بيانات الهوية ومعرض الأعمال مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير."
     : "وضع تجريبي محلي: بيانات وصور الهوية لا تُرفع إلى خادم.";
   populateSelects();
   setupDistrictSelects();
+  setupRequestExperience();
+  setupJoinEnhancements();
+  setupCustomerAuth();
+  setupArtisanDashboard();
+  byId("support-settings").elements.phone.readOnly = true;
+  void loadPaymentAccounts();
+  updatePaymentInstructions();
   renderTradeCards(trades, byId("home-trade-grid"));
   renderTradeCards(trades, byId("directory-grid"));
   renderDashboard();
