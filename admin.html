@@ -45,10 +45,10 @@
       </div>
 
       <section class="panel">
-        <div class="panel-heading"><div><h2>طلبات العملاء والعمليات</h2><p class="muted">أضف السعر النهائي وحدد طريقة الدفع وحالتها. الحصة تُحسب عند اعتماد الدفع كمكتمل.</p></div></div>
+        <div class="panel-heading"><div><h2>طلبات العملاء والعمليات</h2><p class="muted">أدخل السعر الإجمالي. الإيصالات الإلكترونية تحدّث حالة العربون تلقائيًا؛ راجع طلبات الكاش أو رقم المعاملة من هذه اللوحة. عمولة 20% وصافي الحرفي يُحتسبان تلقائيًا عند إكمال العميل واستلام الخدمة.</p></div></div>
         <form class="filters" id="filters-form">
           <label>بحث<input id="search-input" type="search" placeholder="اسم العميل، الهاتف، الحرفة"></label>
-          <label>حالة الطلب<select id="status-filter"><option value="">كل الحالات</option><option>قيد المراجعة</option><option>تم التأكيد</option><option>قيد التنفيذ</option><option>مكتمل</option><option>ملغي</option></select></label>
+          <label>حالة الطلب<select id="status-filter"><option value="">كل الحالات</option><option>قيد المراجعة</option><option>تم التأكيد</option><option>تم دفع العربون - قيد التنفيذ</option><option>بانتظار تأكيد العميل</option><option>مكتمل نهائياً</option><option>بانتظار مراجعة العربون</option><option>بانتظار مراجعة العربون النقدي</option><option>ملغي</option></select></label>
           <label>طريقة الدفع<select id="payment-filter"><option value="">كل طرق الدفع</option><option value="instapay">InstaPay</option><option value="vodafone_cash">Vodafone Cash</option><option value="cash">كاش</option></select></label>
           <button class="button secondary" id="refresh-button" type="button">تحديث</button>
         </form>

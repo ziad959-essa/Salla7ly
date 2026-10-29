@@ -279,7 +279,23 @@
     "سنرسل كود تحقق إلى رقم موبايلك.": "We will send a verification code to your phone.",
     "لديك حساب؟ تسجيل الدخول": "Already have an account? Log in",
     "حساب جديد؟ سجّل الآن": "New here? Sign up",
-    "حساب الحرفي": "Professional account"
+    "حساب الحرفي": "Professional account",
+    "🛡️ ضمان صلحلي": "🛡️ Salla7ly guarantee",
+    "متابعة آخر طلب": "Track latest order",
+    "متابعة الطلب والدفع": "Order and payment tracking",
+    "إيصال تحويل العربون 50% (اختياري عند إدخال رقم المعاملة)": "50% deposit receipt (optional when entering a transaction ID)",
+    "رقم معاملة العربون (أو ارفع الإيصال)": "Deposit transaction ID (or upload a receipt)",
+    "إرسال إثبات العربون": "Submit deposit proof",
+    "إيصال الدفعة المتبقية (اختياري عند إدخال رقم المعاملة)": "Remaining payment receipt (optional when entering a transaction ID)",
+    "رقم معاملة الدفعة المتبقية": "Remaining payment transaction ID",
+    "تأكيد واستلام الخدمة": "Confirm and receive service",
+    "تم تنفيذ الخدمة": "Service completed",
+    "مكتمل نهائياً": "Completed",
+    "بانتظار تأكيد العميل": "Awaiting customer confirmation",
+    "تم دفع العربون - قيد التنفيذ": "Deposit paid - in progress",
+    "بانتظار اعتماد السعر؛ العربون 50% والباقي 50% بعد إتمام الخدمة.": "Waiting for a price quote; 50% deposit and the remaining 50% after service completion.",
+    "لا تُصرف مستحقات الحرفي من المنصة قبل تأكيدك رضاك واستلام الخدمة.": "The professional's platform payout is not released before you confirm satisfaction and receipt.",
+    "تنبيه: التحويل إلى InstaPay أو Vodafone Cash في النسخة الحالية يتم مباشرةً إلى رقم الاستقبال، ولا تحتجز المنصة الأموال فعليًا. يلزم ربط بوابة دفع/حساب ضمان لتفعيل الحجز والإفراج الآلي.": "Note: InstaPay and Vodafone Cash transfers currently go directly to the recipient; the platform does not hold funds. A payment gateway/escrow account is required for actual holds and automatic release."
   });
 
   function localized(value) {
@@ -379,11 +395,13 @@
   const pageNames = new Set(["home", "services", "request", "join", "artisan"]);
   const supportPhone = "01068076603";
   const paymentPhone = "01063459472";
+  const currencyFormatter = new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 });
   const storageKeys = {
     orders: "salla7ly-v2-orders",
     workers: "salla7ly-v2-worker-applications",
     messages: "salla7ly-v2-messages",
-    reviews: "salla7ly-v2-reviews"
+    reviews: "salla7ly-v2-reviews",
+    trackingToken: "salla7ly-v2-tracking-token"
   };
   const nav = document.querySelector(".main-nav");
   const menuToggle = document.querySelector(".menu-toggle");
@@ -562,6 +580,14 @@
     intro.className = "payment-intro";
     intro.textContent = "اختار وسيلة الدفع المناسبة. التحويل يتم يدويًا بعد تأكيد السعر.";
     section.append(heading, intro);
+    const guarantee = document.createElement("aside");
+    guarantee.className = "salla7ly-guarantee";
+    guarantee.append(
+      textElement("strong", "", "🛡️ ضمان صلحلي"),
+      textElement("p", "", "تدفع 50% عربون إلكترونيًا بعد اعتماد السعر، والباقي بعد تنفيذ الخدمة. لا تُصرف مستحقات الحرفي من المنصة قبل تأكيدك رضاك واستلام الخدمة."),
+      textElement("small", "", "تنبيه: التحويل إلى InstaPay أو Vodafone Cash في النسخة الحالية يتم مباشرةً إلى رقم الاستقبال، ولا تحتجز المنصة الأموال فعليًا. يلزم ربط بوابة دفع/حساب ضمان لتفعيل الحجز والإفراج الآلي.")
+    );
+    section.append(guarantee);
     const methodLabel = document.createElement("label");
     methodLabel.className = "form-label";
     methodLabel.append(document.createTextNode("طريقة الدفع المفضلة"));
@@ -578,24 +604,13 @@
     methodLabel.append(method);
     section.append(methodLabel);
 
-    const digitalFields = document.createElement("div");
-    digitalFields.id = "digital-payment-fields";
-    digitalFields.className = "payment-conditional-fields";
-    digitalFields.hidden = true;
     const recipient = document.createElement("p");
     recipient.id = "payment-recipient";
     recipient.className = "payment-recipient";
-    digitalFields.append(recipient);
-    const receipt = createFormField("رفع صورة الإيصال (اختياري إذا كتبت رقم المعاملة)", "payment_receipt", "file", {
-      accept: "image/jpeg,image/png,image/webp,application/pdf"
-    });
-    receipt.input.id = "payment-receipt";
-    const transaction = createFormField("أو رقم Transaction ID", "transaction_id", "text", {
-      autocomplete: "off",
-      placeholder: "اكتب رقم المعاملة"
-    });
-    transaction.input.id = "transaction-id";
-    digitalFields.append(receipt.label, transaction.label);
+    section.append(recipient);
+    const depositNote = textElement("p", "deposit-note", "يظهر مبلغ العربون 50% بعد اعتماد السعر، ويمكنك دفعه من نافذة متابعة الطلب.");
+    depositNote.id = "deposit-note";
+    section.append(depositNote);
 
     const cashFields = document.createElement("div");
     cashFields.id = "cash-payment-fields";
@@ -607,7 +622,7 @@
     });
     cashLocation.input.id = "cash-location-details";
     cashFields.append(cashLocation.label);
-    section.append(digitalFields, cashFields);
+    section.append(cashFields);
     form.querySelector(".form-submit").before(section);
 
     const sqm = createFormField("المساحة بالمتر المربع", "area_size_sqm", "number", {
@@ -620,9 +635,7 @@
     sqm.label.hidden = true;
     byId("request-service-options").closest(".form-label").after(sqm.label);
 
-    method.addEventListener("change", updatePaymentInstructions);
-    transaction.input.addEventListener("input", updatePaymentInstructions);
-    receipt.input.addEventListener("change", updatePaymentInstructions);
+    byId("payment-method").addEventListener("change", updatePaymentInstructions);
     byId("request-trade").addEventListener("change", (event) => {
       const needsArea = ["سيراميك وبلاط", "دهانات ونقاشة"].includes(event.target.value);
       sqm.label.hidden = !needsArea;
@@ -635,6 +648,83 @@
     liveStatus.className = "request-live-status";
     liveStatus.setAttribute("aria-live", "polite");
     byId("availability-description").after(liveStatus);
+
+    const tracking = document.createElement("section");
+    tracking.id = "customer-order-tracking";
+    tracking.className = "customer-order-tracking";
+    const trackingHeading = document.createElement("h3");
+    trackingHeading.textContent = "متابعة الطلب والدفع";
+    const trackingStatus = textElement("p", "tracking-status", "سيظهر تحديث الطلب هنا.");
+    trackingStatus.id = "customer-tracking-status";
+    const amounts = textElement("p", "tracking-amounts", "");
+    amounts.id = "customer-tracking-amounts";
+    const depositForm = document.createElement("form");
+    depositForm.id = "deposit-payment-form";
+    depositForm.className = "final-payment-form";
+    depositForm.hidden = true;
+    depositForm.append(textElement("p", "payment-recipient", ""));
+    const depositReceipt = createFormField("إيصال تحويل العربون 50% (اختياري عند إدخال رقم المعاملة)", "deposit_receipt", "file", {
+      accept: "image/jpeg,image/png,image/webp,application/pdf"
+    });
+    depositReceipt.input.id = "deposit-payment-receipt";
+    const depositTransaction = createFormField("رقم معاملة العربون (أو ارفع الإيصال)", "deposit_transaction_id", "text", {
+      autocomplete: "off",
+      placeholder: "اكتب رقم المعاملة"
+    });
+    depositTransaction.input.id = "deposit-transaction-id";
+    depositForm.append(depositReceipt.label, depositTransaction.label);
+    const depositButton = document.createElement("button");
+    depositButton.type = "submit";
+    depositButton.className = "button button-primary";
+    depositButton.textContent = "إرسال إثبات العربون";
+    depositForm.append(depositButton);
+    depositForm.addEventListener("submit", submitOrderDeposit);
+    const finalPayment = document.createElement("form");
+    finalPayment.id = "final-payment-form";
+    finalPayment.className = "final-payment-form";
+    finalPayment.hidden = true;
+    finalPayment.append(textElement("p", "payment-recipient", ""));
+    const finalReceipt = createFormField("إيصال الدفعة المتبقية (اختياري عند إدخال رقم المعاملة)", "final_payment_receipt", "file", {
+      accept: "image/jpeg,image/png,image/webp,application/pdf"
+    });
+    finalReceipt.input.id = "final-payment-receipt";
+    const finalTransaction = createFormField("رقم معاملة الدفعة المتبقية", "final_transaction_id", "text", {
+      autocomplete: "off",
+      placeholder: "اكتب رقم المعاملة"
+    });
+    finalTransaction.input.id = "final-transaction-id";
+    finalPayment.append(finalReceipt.label, finalTransaction.label);
+    const confirmButton = document.createElement("button");
+    confirmButton.type = "submit";
+    confirmButton.className = "button button-primary";
+    confirmButton.textContent = "تأكيد واستلام الخدمة";
+    finalPayment.append(confirmButton);
+    tracking.append(trackingHeading, trackingStatus, amounts, depositForm, finalPayment);
+    byId("availability-workers").before(tracking);
+    const trackButton = document.createElement("button");
+    trackButton.type = "button";
+    trackButton.id = "track-order-button";
+    trackButton.className = "text-link";
+    trackButton.textContent = "متابعة آخر طلب";
+    trackButton.hidden = !readStore(storageKeys.trackingToken, "");
+    trackButton.addEventListener("click", () => {
+      const trackingToken = readStore(storageKeys.trackingToken, "");
+      if (!trackingToken) return;
+      showAvailabilityResult([], { trackingToken });
+    });
+    document.querySelector(".footer-links").append(trackButton);
+    finalTransaction.input.addEventListener("input", updateFinalPaymentRequirement);
+    finalReceipt.input.addEventListener("change", updateFinalPaymentRequirement);
+    finalPayment.addEventListener("submit", confirmFinalPayment);
+  }
+
+  function updateFinalPaymentRequirement() {
+    const proofProvided = Boolean(
+      byId("final-transaction-id").value.trim()
+      || byId("final-payment-receipt").files.length
+    );
+    const digital = !["cash", ""].includes(currentTrackingOrder?.payment_method);
+    byId("final-payment-receipt").required = digital && !proofProvided;
   }
 
   function setupJoinEnhancements() {
@@ -795,6 +885,7 @@
     dialog.innerHTML = '<button type="button" class="dialog-close" data-dialog-close aria-label="إغلاق">×</button><div class="eyebrow">تأكيد استلام الطلب</div><h2>وقت الوصول المتوقع</h2><form id="artisan-accept-form"><label class="form-label">الوقت بالدقائق<input name="arrival_minutes" type="number" min="1" max="1440" step="1" required placeholder="مثال: 30"></label><button class="button button-primary form-submit" type="submit">قبول الطلب</button></form>';
     document.body.append(dialog);
     let acceptedMatchId = "";
+    let matchesChannel = null;
 
     async function loadMatches() {
       const host = byId("artisan-orders");
@@ -829,6 +920,26 @@
             dialog.showModal();
           });
           card.append(accept);
+        } else if (match.status === "accepted" && order.status === "تم دفع العربون - قيد التنفيذ") {
+          const complete = document.createElement("button");
+          complete.type = "button";
+          complete.className = "button button-primary";
+          complete.textContent = "تم تنفيذ الخدمة";
+          complete.addEventListener("click", async () => {
+            const { error: completionError } = await supabaseClient.rpc("complete_service_order", {
+              match_id: match.id
+            });
+            if (completionError) {
+              console.error("Could not mark the service order complete.", completionError);
+              showToast(completionError.message || "تعذر تحديث حالة الخدمة.");
+              return;
+            }
+            showToast("تم إشعار العميل بانتهاء الخدمة ليدفع المتبقي ويؤكد الاستلام.");
+            await loadMatches();
+          });
+          card.append(complete);
+        } else if (match.status === "accepted" && order.status === "بانتظار تأكيد العميل") {
+          card.append(textElement("span", "record-status", "بانتظار تأكيد العميل واستلام الدفعة المتبقية."));
         } else if (match.status === "accepted") {
           card.append(textElement("span", "record-status", `تم قبول الطلب · الوصول خلال ${order.estimated_arrival_minutes || "—"} دقيقة`));
         } else {
@@ -837,6 +948,31 @@
         host.append(card);
       });
       host.hidden = false;
+    }
+
+    function subscribeToMatches() {
+      if (matchesChannel) return;
+      matchesChannel = supabaseClient.channel("artisan-service-order-matches")
+        .on("postgres_changes", {
+          event: "*",
+          schema: "public",
+          table: "service_order_matches"
+        }, () => {
+          void loadMatches();
+        })
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "service_orders"
+        }, () => {
+          void loadMatches();
+        })
+        .subscribe((status) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.error("Real-time artisan order matching failed.", status);
+            showToast("تعذر تفعيل التنبيهات الفورية للطلبات المطابقة.");
+          }
+        });
     }
 
     byId("artisan-send-code").addEventListener("click", async () => {
@@ -886,6 +1022,7 @@
       byId("artisan-code-label").hidden = true;
       byId("artisan-verify-code").hidden = true;
       byId("artisan-signout").hidden = false;
+      subscribeToMatches();
       await loadMatches();
     });
     byId("artisan-signout").addEventListener("click", async () => {
@@ -894,6 +1031,11 @@
         console.error("Could not sign out the artisan.", error);
         showToast("تعذر تسجيل الخروج.");
         return;
+      }
+      if (matchesChannel) {
+        const status = await supabaseClient.removeChannel(matchesChannel);
+        if (status === "error") console.error("Could not stop artisan order notifications.");
+        matchesChannel = null;
       }
       byId("artisan-orders").hidden = true;
       byId("artisan-send-code").hidden = false;
@@ -1162,6 +1304,11 @@
       ? `رقم الطلب: ${order.id} — سيتم تحديث الحالة ووقت الوصول هنا تلقائيًا.`
       : "سيتم تحديث حالة الطلب عند توفر فني مناسب.";
     if (order.trackingToken) void subscribeToOrderTracking(order.trackingToken);
+    if (order.trackingToken) {
+      writeStore(storageKeys.trackingToken, order.trackingToken);
+      byId("track-order-button").hidden = false;
+      void refreshCustomerOrderTracking(order.trackingToken, order);
+    }
 
     workers.forEach((worker) => {
       const card = document.createElement("article");
@@ -1293,23 +1440,26 @@
 
   function updatePaymentInstructions() {
     const method = byId("payment-method").value;
-    const digital = method === "instapay" || method === "vodafone_cash";
-    byId("digital-payment-fields").hidden = !digital;
     byId("cash-payment-fields").hidden = method !== "cash";
     byId("cash-location-details").required = method === "cash";
-    const hasTransactionId = Boolean(byId("transaction-id").value.trim());
-    const hasReceipt = Boolean(byId("payment-receipt").files.length);
-    byId("payment-receipt").required = digital && !hasTransactionId && !hasReceipt;
-    byId("transaction-id").required = false;
-    if (digital) {
+    if (method === "instapay" || method === "vodafone_cash") {
       const methodName = method === "instapay" ? "InstaPay" : "Vodafone Cash";
       const account = paymentAccounts[method] || paymentPhone;
       byId("payment-recipient").textContent = `${methodName}: ${account}`;
+      byId("deposit-note").textContent = "يظهر مبلغ العربون 50% بعد اعتماد السعر، ويمكنك دفعه من نافذة متابعة الطلب.";
+    } else if (method === "cash") {
+      byId("payment-recipient").textContent = "الدفع النقدي يحتاج مراجعة استلام العربون من الإدارة.";
+      byId("deposit-note").textContent = "سيظل الطلب بانتظار تأكيد استلام العربون النقدي قبل بدء التنفيذ.";
+    } else {
+      byId("payment-recipient").textContent = "";
+      byId("deposit-note").textContent = "يظهر مبلغ العربون 50% بعد اعتماد السعر، ويمكنك دفعه من نافذة متابعة الطلب.";
     }
   }
 
   let paymentAccounts = { instapay: paymentPhone, vodafone_cash: paymentPhone };
   let activeTrackingChannel = null;
+  let currentTrackingToken = "";
+  let currentTrackingOrder = null;
 
   async function loadPaymentAccounts() {
     if (!supabaseConfigured) return;
@@ -1339,7 +1489,8 @@
     activeTrackingChannel = supabaseClient.channel(`order-tracking:${trackingToken}`, {
       config: { private: false }
     }).on("broadcast", { event: "order_updated" }, ({ payload }) => {
-      renderTrackingUpdate(payload);
+      if (payload?.status) renderTrackingUpdate(payload);
+      void refreshCustomerOrderTracking(trackingToken);
     }).subscribe((status) => {
       if (status === "SUBSCRIBED" && !isSubscribed) {
         isSubscribed = true;
@@ -1370,6 +1521,124 @@
         : `حالة الطلب: ${status}`;
   }
 
+  async function refreshCustomerOrderTracking(trackingToken, fallbackOrder = null) {
+    currentTrackingToken = trackingToken;
+    if (!supabaseConfigured) {
+      currentTrackingOrder = fallbackOrder;
+      byId("customer-tracking-status").textContent = fallbackOrder?.status || "تم حفظ الطلب محليًا؛ التحديثات الفورية تحتاج إعداد Supabase.";
+      byId("customer-tracking-amounts").textContent = "يتم تحديد السعر ونصفه كعربون ونصفه المتبقي بعد مراجعة الطلب.";
+      byId("final-payment-form").hidden = true;
+      return;
+    }
+
+    const { data, error } = await supabaseClient.rpc("get_order_tracking", {
+      p_tracking_token: trackingToken
+    });
+    if (error) {
+      console.error("Could not load customer order tracking.", error);
+      byId("customer-tracking-status").textContent = "تعذر تحميل حالة الطلب حاليًا.";
+      return;
+    }
+    if (!data) {
+      byId("customer-tracking-status").textContent = "لم يتم العثور على الطلب.";
+      return;
+    }
+    currentTrackingOrder = data;
+    renderTrackingUpdate(data);
+    byId("customer-tracking-status").textContent = data.status;
+    byId("customer-tracking-amounts").textContent = data.total_amount == null
+      ? "بانتظار اعتماد السعر؛ العربون 50% والباقي 50% بعد إتمام الخدمة."
+      : `إجمالي السعر: ${currencyFormatter.format(data.total_amount)} ج.م · العربون 50%: ${currencyFormatter.format(data.deposit_amount)} ج.م · المتبقي: ${currencyFormatter.format(data.remaining_amount)} ج.م`;
+    const depositForm = byId("deposit-payment-form");
+    const canSubmitDeposit = data.total_amount != null
+      && data.deposit_status === "غير مدفوع"
+      && ["instapay", "vodafone_cash"].includes(data.payment_method);
+    depositForm.hidden = !canSubmitDeposit;
+    if (canSubmitDeposit) {
+      const methodName = data.payment_method === "instapay" ? "InstaPay" : "Vodafone Cash";
+      depositForm.querySelector(".payment-recipient").textContent =
+        `حوّل العربون (${currencyFormatter.format(data.deposit_amount)} ج.م) عبر ${methodName}: ${paymentAccounts[data.payment_method] || paymentPhone}`;
+    } else if (data.deposit_status === "بانتظار المراجعة") {
+      byId("customer-tracking-status").textContent = "تم استلام بيانات العربون، وهو بانتظار مراجعة الإدارة.";
+    }
+    const canConfirm = data.status === "بانتظار تأكيد العميل"
+      && data.deposit_status === "تم الدفع"
+      && data.total_amount != null;
+    byId("final-payment-form").hidden = !canConfirm;
+    if (canConfirm) {
+      const method = data.payment_method;
+      const recipient = byId("final-payment-form").querySelector(".payment-recipient");
+      recipient.textContent = method === "cash"
+        ? "سجّل دفع المبلغ المتبقي نقدًا، ثم أكّد الاستلام."
+        : `المتبقي عبر ${method === "instapay" ? "InstaPay" : "Vodafone Cash"}: ${paymentAccounts[method] || paymentPhone}`;
+      updateFinalPaymentRequirement();
+    } else {
+      byId("final-payment-form").reset();
+      byId("final-payment-receipt").required = false;
+    }
+  }
+
+  async function submitOrderDeposit(event) {
+    event.preventDefault();
+    if (!currentTrackingToken || !currentTrackingOrder?.total_amount) return;
+    const receiptFile = byId("deposit-payment-receipt").files[0];
+    const transactionId = byId("deposit-transaction-id").value.trim();
+    if (!receiptFile && !transactionId) {
+      showToast("ارفع إيصال العربون أو أدخل رقم المعاملة.");
+      return;
+    }
+    const receiptPath = await uploadOrderReceipt(receiptFile || null, currentTrackingToken, "deposit");
+    if (receiptPath === null) return;
+    const { error } = await supabaseClient.rpc("submit_order_deposit", {
+      p_tracking_token: currentTrackingToken,
+      p_receipt_path: receiptPath || null,
+      p_transaction_id: transactionId || null
+    });
+    if (error) {
+      console.error("Could not submit the order deposit proof.", error);
+      showToast(error.message || "تعذر إرسال إثبات العربون.");
+      return;
+    }
+    showToast(receiptPath
+      ? "تم استلام إيصال العربون وتحديث حالة الطلب."
+      : "تم إرسال رقم المعاملة، وهو بانتظار مراجعة الإدارة.");
+    await refreshCustomerOrderTracking(currentTrackingToken);
+  }
+
+  async function confirmFinalPayment(event) {
+    event.preventDefault();
+    if (!currentTrackingToken || !currentTrackingOrder) return;
+    const receiptFile = byId("final-payment-receipt").files[0];
+    const transactionId = byId("final-transaction-id").value.trim();
+    const digital = currentTrackingOrder.payment_method !== "cash";
+    if (digital && !receiptFile && !transactionId) {
+      showToast("ارفع إيصال الدفعة المتبقية أو أدخل رقم المعاملة.");
+      return;
+    }
+    const receiptPath = await uploadOrderReceipt(
+      receiptFile || null,
+      currentTrackingToken,
+      "final"
+    );
+    if (receiptPath === null) return;
+    if (!supabaseConfigured) {
+      showToast("يحتاج تأكيد الدفعة النهائية إلى اتصال Supabase.");
+      return;
+    }
+    const { error } = await supabaseClient.rpc("confirm_order_delivery", {
+      p_tracking_token: currentTrackingToken,
+      p_final_receipt_path: receiptPath || null,
+      p_final_transaction_id: transactionId || null
+    });
+    if (error) {
+      console.error("Could not confirm final payment and service delivery.", error);
+      showToast(error.message || "تعذر تأكيد استلام الخدمة.");
+      return;
+    }
+    showToast("تم تأكيد استلام الخدمة وتسجيل الدفعة النهائية.");
+    await refreshCustomerOrderTracking(currentTrackingToken);
+  }
+
   function fileExtension(file) {
     if (file.type === "image/png") return "png";
     if (file.type === "image/webp") return "webp";
@@ -1377,7 +1646,7 @@
     return "jpg";
   }
 
-  async function uploadOrderReceipt(file, trackingToken) {
+  async function uploadOrderReceipt(file, trackingToken, stage = "deposit") {
     if (!file) return "";
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
     if (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024) {
@@ -1385,7 +1654,7 @@
       return null;
     }
     if (!supabaseConfigured) return file.name;
-    const path = `${trackingToken}/${crypto.randomUUID()}.${fileExtension(file)}`;
+    const path = `${trackingToken}/${stage}/${crypto.randomUUID()}.${fileExtension(file)}`;
     const { error } = await supabaseClient.storage.from("payment-receipts")
       .upload(path, file, { contentType: file.type, upsert: false });
     if (error) {
@@ -1540,9 +1809,6 @@
     const data = new FormData(form);
     const area = data.get("area") === "__other__" ? data.get("area_other") : data.get("area");
     const trackingToken = crypto.randomUUID();
-    const receiptFile = data.get("payment_receipt");
-    const receiptPath = await uploadOrderReceipt(receiptFile?.size ? receiptFile : null, trackingToken);
-    if (receiptPath === null) return;
     const order = {
       id: crypto.randomUUID(),
       trackingToken,
@@ -1555,8 +1821,6 @@
       name: data.get("name"),
       phone: data.get("phone"),
       paymentMethod: data.get("payment_method"),
-      paymentReceipt: receiptPath,
-      transactionId: data.get("transaction_id"),
       cashLocationDetails: data.get("cash_location_details"),
       areaSizeSqm: data.get("area_size_sqm") || null,
       matchedWorkers: findAvailableWorkers(data.get("trade"), data.get("governorate"), area),
@@ -1574,8 +1838,6 @@
         address: order.address,
         details: order.details || "",
         payment_method: order.paymentMethod,
-        payment_receipt_path: supabaseConfigured ? receiptPath || null : null,
-        transaction_id: order.transactionId || null,
         cash_location_details: order.cashLocationDetails || null,
         area_size_sqm: order.areaSizeSqm,
         tracking_token: order.trackingToken
@@ -1595,8 +1857,6 @@
     renderRequestServices("");
     byId("area-size-sqm").value = "";
     byId("area-size-sqm").closest(".form-label").hidden = true;
-    byId("payment-receipt").required = false;
-    byId("transaction-id").required = false;
     updatePaymentInstructions();
     resetDistrictSelect("request-form", "request-area");
     renderDashboard();

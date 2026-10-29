@@ -75,6 +75,12 @@ create table if not exists public.service_orders (
   payment_method text check (payment_method in ('instapay', 'vodafone_cash', 'cash')),
   payment_receipt_path text,
   transaction_id text,
+  deposit_status text not null default 'غير مدفوع'
+    check (deposit_status in ('غير مدفوع', 'تم الدفع', 'بانتظار المراجعة')),
+  final_payment_receipt_path text,
+  final_transaction_id text,
+  final_payment_status text not null default 'غير مدفوع'
+    check (final_payment_status in ('غير مدفوع', 'تم الدفع')),
   cash_location_details text,
   area_size_sqm numeric(10, 2) check (area_size_sqm is null or area_size_sqm > 0),
   status text not null default 'قيد المراجعة',
@@ -100,6 +106,10 @@ create table if not exists public.service_orders (
 alter table public.service_orders add column if not exists tracking_token uuid not null default gen_random_uuid();
 alter table public.service_orders add column if not exists payment_receipt_path text;
 alter table public.service_orders add column if not exists transaction_id text;
+alter table public.service_orders add column if not exists deposit_status text not null default 'غير مدفوع';
+alter table public.service_orders add column if not exists final_payment_receipt_path text;
+alter table public.service_orders add column if not exists final_transaction_id text;
+alter table public.service_orders add column if not exists final_payment_status text not null default 'غير مدفوع';
 alter table public.service_orders add column if not exists cash_location_details text;
 alter table public.service_orders add column if not exists area_size_sqm numeric(10, 2);
 alter table public.service_orders add column if not exists professional_net numeric(12, 2) generated always as (
@@ -119,6 +129,12 @@ alter table public.service_orders add constraint service_orders_area_size_sqm_ch
 alter table public.service_orders drop constraint if exists service_orders_estimated_arrival_minutes_check;
 alter table public.service_orders add constraint service_orders_estimated_arrival_minutes_check
   check (estimated_arrival_minutes is null or estimated_arrival_minutes between 1 and 1440);
+alter table public.service_orders drop constraint if exists service_orders_deposit_status_check;
+alter table public.service_orders add constraint service_orders_deposit_status_check
+  check (deposit_status in ('غير مدفوع', 'تم الدفع', 'بانتظار المراجعة'));
+alter table public.service_orders drop constraint if exists service_orders_final_payment_status_check;
+alter table public.service_orders add constraint service_orders_final_payment_status_check
+  check (final_payment_status in ('غير مدفوع', 'تم الدفع'));
 
 create table if not exists public.professionals (
   id uuid primary key default gen_random_uuid(),
@@ -180,6 +196,45 @@ drop trigger if exists match_professionals_after_order_insert on public.service_
 create trigger match_professionals_after_order_insert
 after insert on public.service_orders
 for each row execute function public.match_service_order();
+
+create or replace function public.record_order_deposit()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.payment_receipt_path is not null
+     and split_part(new.payment_receipt_path, '/', 1) = new.tracking_token::text
+     and exists (
+       select 1 from storage.objects o
+       where o.bucket_id = 'payment-receipts'
+         and o.name = new.payment_receipt_path
+     ) then
+    update public.service_orders
+    set deposit_status = 'تم الدفع',
+        payment_status = 'عربون مدفوع',
+        status = 'تم دفع العربون - قيد التنفيذ'
+    where id = new.id;
+  elsif new.transaction_id is not null then
+    update public.service_orders
+    set deposit_status = 'بانتظار المراجعة',
+        status = 'بانتظار مراجعة العربون'
+    where id = new.id;
+  elsif new.payment_method = 'cash' then
+    update public.service_orders
+    set deposit_status = 'بانتظار المراجعة',
+        status = 'بانتظار مراجعة العربون النقدي'
+    where id = new.id;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists record_order_deposit_after_insert on public.service_orders;
+create trigger record_order_deposit_after_insert
+after insert on public.service_orders
+for each row execute function public.record_order_deposit();
 
 create or replace function public.match_pending_orders_for_professional()
 returns trigger
@@ -266,7 +321,10 @@ begin
   update public.service_orders
   set accepted_professional_id = professional,
       estimated_arrival_minutes = arrival_minutes,
-      status = 'تم التأكيد'
+      status = case when deposit_status = 'تم الدفع'
+        then 'تم دفع العربون - قيد التنفيذ'
+        else 'تم التأكيد'
+      end
   where id = selected_order and accepted_professional_id is null
   returning id into selected_order;
   if selected_order is null then
@@ -279,6 +337,132 @@ begin
 end;
 $$;
 
+create or replace function public.complete_service_order(match_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  professional uuid;
+  selected_order uuid;
+begin
+  select p.id into professional
+  from public.professionals p
+  where p.user_id = auth.uid() and p.status = 'مقبول';
+  if professional is null then
+    raise exception 'No approved professional account is linked.';
+  end if;
+
+  select m.order_id into selected_order
+  from public.service_order_matches m
+  where m.id = match_id
+    and m.status = 'accepted'
+    and m.professional_id = professional
+  for update;
+  if selected_order is null then
+    raise exception 'This service order is not assigned to this professional.';
+  end if;
+
+  update public.service_orders
+  set status = 'بانتظار تأكيد العميل'
+  where id = selected_order
+    and accepted_professional_id = professional
+    and deposit_status = 'تم الدفع'
+    and status = 'تم دفع العربون - قيد التنفيذ';
+  if not found then
+    raise exception 'The deposit must be recorded before completing this service.';
+  end if;
+end;
+$$;
+
+create or replace function public.submit_order_deposit(
+  p_tracking_token uuid,
+  p_receipt_path text default null,
+  p_transaction_id text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  receipt_is_valid boolean := p_receipt_path is not null
+    and split_part(p_receipt_path, '/', 1) = p_tracking_token::text
+    and split_part(p_receipt_path, '/', 2) = 'deposit'
+    and exists (
+      select 1 from storage.objects o
+      where o.bucket_id = 'payment-receipts'
+        and o.name = p_receipt_path
+    );
+  transaction_value text := nullif(trim(coalesce(p_transaction_id, '')), '');
+begin
+  if not receipt_is_valid and transaction_value is null then
+    raise exception 'Upload a deposit receipt or enter a transaction ID.';
+  end if;
+
+  update public.service_orders
+  set payment_receipt_path = case when receipt_is_valid then p_receipt_path else null end,
+      transaction_id = transaction_value,
+      deposit_status = case when receipt_is_valid then 'تم الدفع' else 'بانتظار المراجعة' end,
+      payment_status = case when receipt_is_valid then 'عربون مدفوع' else 'غير مدفوع' end,
+      status = case when receipt_is_valid
+        then 'تم دفع العربون - قيد التنفيذ'
+        else 'بانتظار مراجعة العربون'
+      end
+  where tracking_token = p_tracking_token
+    and total_amount is not null
+    and payment_method in ('instapay', 'vodafone_cash')
+    and deposit_status = 'غير مدفوع';
+
+  if not found then
+    raise exception 'This order is not awaiting a deposit.';
+  end if;
+end;
+$$;
+
+create or replace function public.confirm_order_delivery(
+  p_tracking_token uuid,
+  p_final_receipt_path text default null,
+  p_final_transaction_id text default null
+)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  update public.service_orders
+  set final_payment_receipt_path = p_final_receipt_path,
+      final_transaction_id = nullif(trim(coalesce(p_final_transaction_id, '')), ''),
+      final_payment_status = 'تم الدفع',
+      payment_status = 'مدفوع',
+      status = 'مكتمل نهائياً'
+  where tracking_token = p_tracking_token
+    and status = 'بانتظار تأكيد العميل'
+    and deposit_status = 'تم الدفع'
+    and total_amount is not null
+    and (
+      payment_method = 'cash'
+      or (
+        p_final_receipt_path is not null
+        and split_part(p_final_receipt_path, '/', 1) = tracking_token::text
+        and split_part(p_final_receipt_path, '/', 2) = 'final'
+        and exists (
+          select 1 from storage.objects o
+          where o.bucket_id = 'payment-receipts'
+            and o.name = p_final_receipt_path
+        )
+      )
+      or nullif(trim(coalesce(p_final_transaction_id, '')), '') is not null
+    );
+
+  if not found then
+    raise exception 'The final payment proof or an eligible order is missing.';
+  end if;
+end;
+$$;
+
 create or replace function public.get_order_tracking(p_tracking_token uuid)
 returns jsonb
 language sql
@@ -288,12 +472,20 @@ set search_path = ''
 as $$
   select jsonb_build_object(
     'status', status,
-    'estimated_arrival_minutes', estimated_arrival_minutes
+    'estimated_arrival_minutes', estimated_arrival_minutes,
+    'payment_status', payment_status,
+    'deposit_status', deposit_status,
+    'final_payment_status', final_payment_status,
+    'total_amount', total_amount,
+    'deposit_amount', case when total_amount is null then null else round(total_amount * 0.50, 2) end,
+    'remaining_amount', case when total_amount is null then null else round(total_amount * 0.50, 2) end,
+    'payment_method', payment_method
   )
   from public.service_orders
   where tracking_token = p_tracking_token;
 $$;
 
+revoke all on function public.get_order_tracking(uuid) from public;
 grant execute on function public.get_order_tracking(uuid) to anon, authenticated;
 
 create or replace function public.broadcast_order_tracking_update()
@@ -304,7 +496,11 @@ set search_path = ''
 as $$
 begin
   if new.estimated_arrival_minutes is distinct from old.estimated_arrival_minutes
-     or new.status is distinct from old.status then
+     or new.status is distinct from old.status
+     or new.total_amount is distinct from old.total_amount
+     or new.deposit_status is distinct from old.deposit_status
+     or new.payment_status is distinct from old.payment_status
+     or new.final_payment_status is distinct from old.final_payment_status then
     perform realtime.send(
       jsonb_build_object(
         'status', new.status,
@@ -345,8 +541,18 @@ grant select, insert, update, delete on public.professionals to authenticated;
 grant insert on public.professionals to anon;
 grant select (id, name, phone, trade, governorate, area, status) on table public.professionals to anon;
 grant select, update on public.service_order_matches to authenticated;
+revoke all on function public.claim_professional_account() from public;
+revoke all on function public.accept_service_order(uuid, integer) from public;
+revoke all on function public.complete_service_order(uuid) from public;
+revoke all on function public.submit_order_deposit(uuid, text, text) from public;
+revoke all on function public.confirm_order_delivery(uuid, text, text) from public;
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to anon, authenticated;
 grant execute on function public.claim_professional_account() to authenticated;
 grant execute on function public.accept_service_order(uuid, integer) to authenticated;
+grant execute on function public.complete_service_order(uuid) to authenticated;
+grant execute on function public.submit_order_deposit(uuid, text, text) to anon, authenticated;
+grant execute on function public.confirm_order_delivery(uuid, text, text) to anon, authenticated;
 grant select, insert, update, delete on public.site_settings to authenticated;
 grant select on public.site_settings to anon;
 
@@ -488,6 +694,22 @@ create index if not exists professionals_created_at_idx on public.professionals 
 create index if not exists professionals_status_idx on public.professionals (status);
 create index if not exists professionals_matching_idx on public.professionals (trade, governorate, area, status);
 create index if not exists service_order_matches_professional_idx on public.service_order_matches (professional_id, status);
+
+do $$
+begin
+  alter publication supabase_realtime add table public.service_order_matches;
+exception
+  when duplicate_object then null;
+end;
+$$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.service_orders;
+exception
+  when duplicate_object then null;
+end;
+$$;
 
 insert into public.site_settings (key, value)
 values ('payment_accounts', '{"instapay":"01063459472","vodafone_cash":"01063459472"}'::jsonb)

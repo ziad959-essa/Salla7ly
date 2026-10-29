@@ -177,7 +177,10 @@
         order.details,
         order.area_size_sqm ? `المساحة: ${order.area_size_sqm} م²` : "",
         order.transaction_id ? `رقم المعاملة: ${order.transaction_id}` : "",
+        order.final_transaction_id ? `معاملة الدفعة النهائية: ${order.final_transaction_id}` : "",
         order.cash_location_details ? `موقع الدفع النقدي: ${order.cash_location_details}` : "",
+        `حالة العربون: ${order.deposit_status || order.payment_status}`,
+        `الحالة: ${order.status}`,
         `الدفع: ${paymentLabel(order.payment_method)}`,
         new Date(order.created_at).toLocaleString("ar-EG")
       ].filter(Boolean).join(" · ");
@@ -197,18 +200,16 @@
       amountLabel.append(amountInput);
       card.append(amountLabel);
 
-      const status = selectControl("حالة الطلب", order.status, [
-        ["قيد المراجعة", "قيد المراجعة"], ["تم التأكيد", "تم التأكيد"],
-        ["قيد التنفيذ", "قيد التنفيذ"], ["مكتمل", "مكتمل"], ["ملغي", "ملغي"]
-      ], "order-status");
-      card.append(status.label);
-      const paid = selectControl("حالة الدفع", order.payment_status, [
-        ["غير مدفوع", "غير مدفوع"], ["مدفوع", "مدفوع"]
-      ], "payment-status");
-      card.append(paid.label);
+      card.append(text("div", "record-controls", `حالة الطلب: ${order.status}`));
+      const depositStatus = selectControl("حالة العربون", order.deposit_status || "غير مدفوع", [
+        ["غير مدفوع", "غير مدفوع"],
+        ["بانتظار المراجعة", "بانتظار المراجعة"],
+        ["تم الدفع", "تم الدفع"]
+      ], "deposit-status");
+      card.append(depositStatus.label);
       const controls = text("div", "record-controls", "حصة الإدارة عند الدفع: 20%");
       controls.classList.add("commission-hint");
-      controls.textContent = `حصة الإدارة (20%): ${formatter.format(Number(order.total_amount || 0) * 0.2)} ج.م · صافي الحرفي (80%): ${formatter.format(Number(order.total_amount || 0) * 0.8)} ج.م عند الدفع`;
+      controls.textContent = `العربون 50%: ${formatter.format(Number(order.total_amount || 0) * 0.5)} ج.م · المتبقي 50%: ${formatter.format(Number(order.total_amount || 0) * 0.5)} ج.م · عمولة المنصة عند الإكمال (20%): ${formatter.format(Number(order.admin_commission || 0))} ج.م · صافي الحرفي: ${formatter.format(Number(order.professional_net || 0))} ج.م`;
       card.append(controls);
       const actions = document.createElement("div");
       actions.className = "record-actions";
@@ -216,6 +217,11 @@
         const receiptButton = actionButton("عرض إيصال الدفع", "view-payment-receipt");
         receiptButton.dataset.path = order.payment_receipt_path;
         actions.append(receiptButton);
+      }
+      if (order.final_payment_receipt_path) {
+        const finalReceiptButton = actionButton("عرض إيصال الدفعة النهائية", "view-payment-receipt");
+        finalReceiptButton.dataset.path = order.final_payment_receipt_path;
+        actions.append(finalReceiptButton);
       }
       actions.append(actionButton("حفظ التعديلات", "save-order"));
       card.append(actions);
@@ -277,9 +283,19 @@
     }
     const updated = {
       total_amount: totalAmount,
-      status: card.querySelector(".order-status").value,
-      payment_status: card.querySelector(".payment-status").value
+      deposit_status: card.querySelector(".deposit-status").value,
+      payment_status: card.querySelector(".deposit-status").value === "تم الدفع"
+        ? (allOrders.find((order) => order.id === card.dataset.orderId)?.payment_status === "مدفوع" ? "مدفوع" : "عربون مدفوع")
+        : "غير مدفوع"
     };
+    const existing = allOrders.find((order) => order.id === card.dataset.orderId);
+    if (updated.deposit_status === "تم الدفع"
+      && !["بانتظار تأكيد العميل", "مكتمل نهائياً"].includes(existing?.status)) {
+      updated.status = "تم دفع العربون - قيد التنفيذ";
+    } else if (updated.deposit_status === "غير مدفوع"
+      && ["قيد المراجعة", "بانتظار مراجعة العربون", "بانتظار مراجعة العربون النقدي"].includes(existing?.status)) {
+      updated.status = "قيد المراجعة";
+    }
     const { error } = await client.from("service_orders").update(updated).eq("id", card.dataset.orderId);
     if (error) {
       console.error("Could not update the service order.", error);
