@@ -270,23 +270,17 @@ security definer
 set search_path = ''
 as $$
 declare
-  verified_phone text := regexp_replace(coalesce(auth.jwt() ->> 'phone', ''), '\D', '', 'g');
+  professional_is_approved boolean;
 begin
-  if auth.uid() is null or verified_phone = '' then
+  if auth.uid() is null then
     return false;
   end if;
-  verified_phone := trim(leading '0' from case
-    when verified_phone like '20%' then substring(verified_phone from 3)
-    else verified_phone
-  end);
-
-  update public.professionals
-  set user_id = auth.uid()
-  where status = 'مقبول'
-    and (user_id is null or user_id = auth.uid())
-    and trim(leading '0' from regexp_replace(phone, '\D', '', 'g')) = verified_phone;
-
-  return found;
+  select exists (
+    select 1
+    from public.professionals
+    where user_id = auth.uid() and status = 'مقبول'
+  ) into professional_is_approved;
+  return professional_is_approved;
 end;
 $$;
 
@@ -598,7 +592,10 @@ create policy "Matched professionals read service orders" on public.service_orde
 drop policy if exists "Anyone submits professional applications" on public.professionals;
 create policy "Anyone submits professional applications" on public.professionals
   for insert to anon, authenticated
-  with check (status = 'قيد المراجعة');
+  with check (
+    status = 'قيد المراجعة'
+    and (user_id is null or user_id = (select auth.uid()))
+  );
 drop policy if exists "Admins manage professionals" on public.professionals;
 create policy "Admins manage professionals" on public.professionals
   for all to authenticated using ((select public.is_admin()))

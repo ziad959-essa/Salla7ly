@@ -271,7 +271,6 @@
     "كاش": "Cash",
     "الرقم القومي": "National ID",
     "14 رقمًا": "14 digits",
-    "كود التحقق المرسل برسالة SMS": "SMS verification code",
     "إرسال كود التحقق": "Send verification code",
     "تأكيد الكود": "Verify code",
     "تسجيل دخول العميل": "Customer login",
@@ -567,6 +566,30 @@
     return { label, input };
   }
 
+  function normalizeEgyptianMobile(value) {
+    const digits = String(value || "")
+      .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+      .replace(/[^\d]/g, "");
+    const local = digits.startsWith("0020")
+      ? digits.slice(4)
+      : digits.startsWith("20")
+        ? digits.slice(2)
+        : digits;
+    const national = local.startsWith("0") ? local : `0${local}`;
+    return /^01[0125]\d{8}$/.test(national) ? `+20${national.slice(1)}` : "";
+  }
+
+  function addPasswordField(afterElement, name, labelText, autocomplete = "new-password") {
+    const field = createFormField(labelText, name, "password", {
+      autocomplete,
+      minlength: "8",
+      required: true,
+      placeholder: "8 أحرف أو أرقام على الأقل"
+    });
+    afterElement.after(field.label);
+    return field.input;
+  }
+
   function setupRequestExperience() {
     const form = byId("request-form");
     byId("payment-method").closest(".form-label").remove();
@@ -729,6 +752,18 @@
 
   function setupJoinEnhancements() {
     const idLabel = byId("id-upload").closest(".form-label");
+    const joinForm = byId("join-form");
+    joinForm.elements.phone.removeAttribute("pattern");
+    joinForm.elements.phone.addEventListener("input", (event) => {
+      event.currentTarget.setCustomValidity("");
+    });
+    const joinPassword = addPasswordField(
+      joinForm.elements.phone.closest(".form-label"),
+      "account_password",
+      "كلمة مرور لحساب الحرفي *"
+    );
+    joinPassword.required = supabaseConfigured;
+    joinPassword.closest("label").hidden = !supabaseConfigured;
     const portfolio = createFormField("صور معرض الأعمال (اختياري)", "portfolio_images", "file", {
       accept: "image/jpeg,image/png,image/webp",
       multiple: true
@@ -750,7 +785,7 @@
       ["كاش", "cash"]
     ].forEach(([label, value]) => payout.add(new Option(label, value)));
     payoutLabel.append(payout);
-    byId("join-form").querySelector(".checkbox-label").before(payoutLabel);
+    joinForm.querySelector(".checkbox-label").before(payoutLabel);
   }
 
   function setupCustomerAuth() {
@@ -765,19 +800,19 @@
       placeholder: "14 رقمًا"
     });
     nationalId.input.required = true;
-    phoneInput.closest("label").after(nationalId.label);
-
-    const code = createFormField("كود التحقق المرسل برسالة SMS", "otp", "text", {
-      inputmode: "numeric",
-      autocomplete: "one-time-code",
-      pattern: "[0-9]{6}",
-      maxlength: "6",
-      placeholder: "000000"
+    nationalId.input.addEventListener("input", () => {
+      nationalId.input.value = nationalId.input.value
+        .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+        .replace(/\D/g, "")
+        .slice(0, 14);
     });
-    code.input.hidden = true;
-    code.label.hidden = true;
-    code.input.required = false;
-    form.querySelector(".form-submit").before(code.label);
+    phoneInput.closest("label").after(nationalId.label);
+    const passwordInput = addPasswordField(
+      nationalId.label,
+      "password",
+      "كلمة المرور *"
+    );
+    phoneInput.addEventListener("input", () => phoneInput.setCustomValidity(""));
     const modeButton = document.createElement("button");
     modeButton.type = "button";
     modeButton.className = "text-link auth-mode-toggle";
@@ -785,72 +820,64 @@
     form.after(modeButton);
     const submit = form.querySelector(".form-submit");
     let mode = "signup";
-    let otpSent = false;
 
     function setMode(nextMode) {
       mode = nextMode;
-      otpSent = false;
       nameInput.required = mode === "signup";
       nationalId.input.required = mode === "signup";
       nameInput.closest("label").hidden = mode !== "signup";
       nationalId.label.hidden = mode !== "signup";
-      code.label.hidden = true;
-      code.input.hidden = true;
-      code.input.required = false;
-      submit.textContent = localized("إرسال كود التحقق");
+      passwordInput.autocomplete = mode === "signup" ? "new-password" : "current-password";
+      passwordInput.minLength = mode === "signup" ? 8 : 1;
+      submit.textContent = localized(mode === "signup" ? "إنشاء حساب" : "دخول");
       byId("auth-title").textContent = localized(mode === "signup" ? "إنشاء حساب عميل" : "تسجيل دخول العميل");
-      dialog.querySelector(".auth-description").textContent = localized("سنرسل كود تحقق إلى رقم موبايلك.");
+      dialog.querySelector(".auth-description").textContent = localized("استخدم رقم الموبايل وكلمة المرور للدخول دون كود SMS.");
       modeButton.textContent = localized(mode === "signup" ? "لديك حساب؟ تسجيل الدخول" : "حساب جديد؟ سجّل الآن");
-    }
-
-    function authPhone() {
-      const value = phoneInput.value.trim();
-      return value.startsWith("+") ? value : value.startsWith("0") ? `+20${value.slice(1)}` : `+20${value}`;
     }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!form.reportValidity()) return;
       if (!supabaseConfigured) {
-        showToast("فعّل إعدادات Supabase ومزوّد SMS لتسجيل الدخول برقم الموبايل.");
+        showToast("فعّل إعدادات Supabase لحفظ الحسابات وتسجيل الدخول.");
         return;
       }
-      if (!otpSent) {
-        const options = { shouldCreateUser: mode === "signup" };
-        if (mode === "signup") {
-          options.data = {
-            full_name: nameInput.value.trim(),
-            national_id: nationalId.input.value.trim()
-          };
-        }
-        const { error } = await supabaseClient.auth.signInWithOtp({ phone: authPhone(), options });
-        if (error) {
-          console.error("Could not send the customer verification code.", error);
-          showToast(error.message || "تعذر إرسال كود التحقق.");
-          return;
-        }
-        otpSent = true;
-        code.label.hidden = false;
-        code.input.hidden = false;
-        code.input.required = true;
-        submit.textContent = "تأكيد الكود";
-        code.input.focus();
-        showToast("تم إرسال كود التحقق إلى موبايلك.");
+      const phone = normalizeEgyptianMobile(phoneInput.value);
+      if (!phone) {
+        phoneInput.setCustomValidity("اكتب رقم موبايل مصري صحيحًا مثل 01012345678 أو +201012345678.");
+        phoneInput.reportValidity();
         return;
       }
-      const { error } = await supabaseClient.auth.verifyOtp({
-        phone: authPhone(),
-        token: code.input.value.trim(),
-        type: "sms"
-      });
+      phoneInput.setCustomValidity("");
+      phoneInput.value = phone;
+      const result = mode === "signup"
+        ? await supabaseClient.auth.signUp({
+          phone,
+          password: passwordInput.value,
+          options: {
+            data: {
+              full_name: nameInput.value.trim(),
+              national_id: nationalId.input.value.trim()
+            }
+          }
+        })
+        : await supabaseClient.auth.signInWithPassword({
+          phone,
+          password: passwordInput.value
+        });
+      const { error } = result;
       if (error) {
-        console.error("Could not verify the customer code.", error);
-        showToast(error.message || "كود التحقق غير صحيح.");
+        console.error(`Could not ${mode === "signup" ? "register" : "sign in"} the customer.`, error);
+        showToast(error.message || (mode === "signup" ? "تعذر إنشاء الحساب." : "تعذر تسجيل الدخول."));
+        return;
+      }
+      if (mode === "signup" && !result.data.session) {
+        showToast("لم يتم تسجيل الدخول. عطّل Phone confirmations في Supabase، أو بدّل إلى تسجيل الدخول إذا كان الحساب موجودًا.");
         return;
       }
       form.reset();
       dialog.close();
-      showToast(mode === "signup" ? "تم إنشاء حساب العميل وتأكيد رقم الموبايل." : "تم تسجيل الدخول بنجاح.");
+      showToast(mode === "signup" ? "تم إنشاء حساب العميل بنجاح." : "تم تسجيل الدخول بنجاح.");
     });
     modeButton.addEventListener("click", () => setMode(mode === "signup" ? "login" : "signup"));
     document.querySelectorAll("[data-auth]").forEach((button) => {
@@ -861,7 +888,7 @@
     });
 
     setMode("signup");
-    dialog.querySelector(".privacy-copy").textContent = "تسجيل الدخول متاح عبر كود SMS. يلزم تفعيل Phone Auth في إعدادات Supabase.";
+    dialog.querySelector(".privacy-copy").textContent = "يلزم تعطيل تأكيد الهاتف (Phone confirmations) في إعدادات Supabase لاستخدام الحساب دون SMS.";
   }
 
   function setupArtisanDashboard() {
@@ -870,7 +897,7 @@
     section.id = "page-artisan";
     section.dataset.page = "artisan";
     section.hidden = true;
-    section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل المسجل بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" pattern="01[0-2,5]{1}[0-9]{8}" placeholder="01xxxxxxxxx" required></label><button class="button button-primary" id="artisan-send-code" type="button">إرسال كود SMS</button><label class="form-label" id="artisan-code-label" hidden>كود التحقق<input id="artisan-code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6"></label><button class="button button-primary" id="artisan-verify-code" type="button" hidden>تأكيد الدخول</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
+    section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل وكلمة المرور المسجلين بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx أو +201xxxxxxxxx" required></label><label class="form-label">كلمة المرور<input id="artisan-password" type="password" autocomplete="current-password" minlength="8" placeholder="8 أحرف أو أرقام على الأقل" required></label><button class="button button-primary" id="artisan-login" type="button">دخول</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
     document.querySelector("main").append(section);
     const link = document.createElement("a");
     link.className = "nav-link";
@@ -975,35 +1002,30 @@
         });
     }
 
-    byId("artisan-send-code").addEventListener("click", async () => {
+    byId("artisan-login").addEventListener("click", async () => {
       if (!supabaseConfigured) {
-        showToast("فعّل إعدادات Supabase ومزوّد SMS أولًا.");
+        showToast("فعّل إعدادات Supabase لتسجيل الدخول.");
         return;
       }
-      const phone = byId("artisan-phone").value.trim();
-      if (!byId("artisan-phone").reportValidity()) return;
-      const formattedPhone = phone.startsWith("+") ? phone : `+20${phone.slice(1)}`;
-      const { error } = await supabaseClient.auth.signInWithOtp({ phone: formattedPhone, options: { shouldCreateUser: true } });
-      if (error) {
-        console.error("Could not send the artisan verification code.", error);
-        showToast(error.message || "تعذر إرسال كود الدخول.");
+      const phoneInput = byId("artisan-phone");
+      const passwordInput = byId("artisan-password");
+      phoneInput.setCustomValidity("");
+      if (!phoneInput.reportValidity() || !passwordInput.reportValidity()) return;
+      const phone = normalizeEgyptianMobile(phoneInput.value);
+      if (!phone) {
+        phoneInput.setCustomValidity("اكتب رقم موبايل مصري صحيحًا مثل 01012345678 أو +201012345678.");
+        phoneInput.reportValidity();
         return;
       }
-      byId("artisan-code-label").hidden = false;
-      byId("artisan-verify-code").hidden = false;
-      showToast("تم إرسال كود الدخول.");
-    });
-    byId("artisan-verify-code").addEventListener("click", async () => {
-      const phone = byId("artisan-phone").value.trim();
-      const formattedPhone = phone.startsWith("+") ? phone : `+20${phone.slice(1)}`;
-      const { error } = await supabaseClient.auth.verifyOtp({
-        phone: formattedPhone,
-        token: byId("artisan-code").value.trim(),
-        type: "sms"
+      phoneInput.setCustomValidity("");
+      phoneInput.value = phone;
+      const { error } = await supabaseClient.auth.signInWithPassword({
+        phone,
+        password: passwordInput.value
       });
       if (error) {
-        console.error("Could not verify the artisan code.", error);
-        showToast(error.message || "كود الدخول غير صحيح.");
+        console.error("Could not sign in the artisan.", error);
+        showToast(error.message || "تعذر تسجيل الدخول. تأكد من رقم الموبايل وكلمة المرور.");
         return;
       }
       const { data: claimed, error: claimError } = await supabaseClient.rpc("claim_professional_account");
@@ -1018,12 +1040,15 @@
         showToast("لم نعثر على طلب حرفي معتمد بهذا الرقم.");
         return;
       }
-      byId("artisan-send-code").hidden = true;
-      byId("artisan-code-label").hidden = true;
-      byId("artisan-verify-code").hidden = true;
+      byId("artisan-login").hidden = true;
+      byId("artisan-phone").closest("label").hidden = true;
+      byId("artisan-password").closest("label").hidden = true;
       byId("artisan-signout").hidden = false;
       subscribeToMatches();
       await loadMatches();
+    });
+    byId("artisan-phone").addEventListener("input", (event) => {
+      event.currentTarget.setCustomValidity("");
     });
     byId("artisan-signout").addEventListener("click", async () => {
       const { error } = await supabaseClient.auth.signOut();
@@ -1038,7 +1063,9 @@
         matchesChannel = null;
       }
       byId("artisan-orders").hidden = true;
-      byId("artisan-send-code").hidden = false;
+      byId("artisan-login").hidden = false;
+      byId("artisan-phone").closest("label").hidden = false;
+      byId("artisan-password").closest("label").hidden = false;
       byId("artisan-signout").hidden = true;
     });
     byId("artisan-accept-form").addEventListener("submit", async (event) => {
@@ -1873,8 +1900,45 @@
   byId("join-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    const phoneInput = form.elements.phone;
+    phoneInput.setCustomValidity("");
     if (!form.reportValidity()) return;
     const data = new FormData(form);
+    const authPhone = normalizeEgyptianMobile(data.get("phone"));
+    if (!authPhone) {
+      phoneInput.setCustomValidity("اكتب رقم موبايل مصري صحيحًا مثل 01012345678 أو +201012345678.");
+      phoneInput.reportValidity();
+      return;
+    }
+    const localPhone = `0${authPhone.slice(3)}`;
+    phoneInput.value = localPhone;
+    data.set("phone", localPhone);
+    let artisanUserId = null;
+    if (supabaseConfigured) {
+      const { data: registration, error: registrationError } = await supabaseClient.auth.signUp({
+        phone: authPhone,
+        password: data.get("account_password"),
+        options: { data: { full_name: String(data.get("name")).trim() } }
+      });
+      if (registrationError) {
+        console.error("Could not create the artisan login.", registrationError);
+        showToast(registrationError.message || "تعذر إنشاء حساب الحرفي.");
+        return;
+      }
+      artisanUserId = registration.user?.id || null;
+      if (!registration.session) {
+        const { data: login, error: loginError } = await supabaseClient.auth.signInWithPassword({
+          phone: authPhone,
+          password: data.get("account_password")
+        });
+        if (loginError || !login.session) {
+          if (loginError) console.error("Could not sign in after artisan registration.", loginError);
+          showToast("تعذر تفعيل الحساب دون SMS. عطّل تأكيد الهاتف (Phone confirmations) في إعدادات Supabase، أو استخدم بيانات دخول حسابك الحالي.");
+          return;
+        }
+        artisanUserId = login.user.id;
+      }
+    }
     let idImage;
     try {
       idImage = await idImagePromise;
@@ -1930,7 +1994,8 @@
         address: worker.address,
         id_image_path: imagePath,
         portfolio_paths: portfolioPaths,
-        payout_method: worker.payoutMethod
+        payout_method: worker.payoutMethod,
+        user_id: artisanUserId
       });
       if (error) {
         console.error("Could not submit the professional application to Supabase.", error);
