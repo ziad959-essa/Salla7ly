@@ -26,7 +26,7 @@ begin
   values (
     new.id,
     coalesce(new.email, ''),
-    new.phone,
+    coalesce(new.phone, new.raw_user_meta_data ->> 'phone'),
     new.raw_user_meta_data ->> 'full_name',
     new.raw_user_meta_data ->> 'national_id'
   )
@@ -528,7 +528,7 @@ from public.professionals
 where status = 'مقبول';
 
 grant select on public.available_professionals to anon, authenticated;
-grant select on public.profiles to authenticated;
+grant select, insert, update on public.profiles to authenticated;
 grant select, insert, update, delete on public.service_orders to authenticated;
 grant insert on public.service_orders to anon;
 grant select, insert, update, delete on public.professionals to authenticated;
@@ -559,6 +559,15 @@ alter table public.service_order_matches enable row level security;
 drop policy if exists "Users read own profile" on public.profiles;
 create policy "Users read own profile" on public.profiles
   for select to authenticated using (id = (select auth.uid()) or (select public.is_admin()));
+drop policy if exists "Users insert own profile" on public.profiles;
+create policy "Users insert own profile" on public.profiles
+  for insert to authenticated
+  with check (id = (select auth.uid()));
+drop policy if exists "Users update own profile" on public.profiles;
+create policy "Users update own profile" on public.profiles
+  for update to authenticated
+  using (id = (select auth.uid()))
+  with check (id = (select auth.uid()));
 drop policy if exists "Admins manage profiles" on public.profiles;
 create policy "Admins manage profiles" on public.profiles
   for all to authenticated using ((select public.is_admin()))

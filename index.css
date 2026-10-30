@@ -282,7 +282,7 @@ img { display: block; max-width: 100%; }
 .profile-notice { color: #89948c; font-size: 11px; }
 .favorite-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 
-.auth-dialog { width: min(430px, calc(100% - 32px)); padding: 31px; border: 1px solid #e6eae2; border-radius: 13px; background: var(--paper); color: var(--ink); box-shadow: 0 25px 90px rgba(14, 31, 21, .25); }
+.auth-dialog { position: relative; width: min(430px, calc(100% - 32px)); padding: 31px 31px 56px; border: 1px solid #e6eae2; border-radius: 13px; background: var(--paper); color: var(--ink); box-shadow: 0 25px 90px rgba(14, 31, 21, .25); }
 .auth-dialog::backdrop { background: rgba(16, 29, 21, .57); backdrop-filter: blur(3px); }
 .dialog-close { position: absolute; top: 13px; left: 15px; width: 30px; height: 30px; border: 0; border-radius: 50%; background: #e9ede5; color: #657269; font-size: 22px; line-height: 1; cursor: pointer; }
 .auth-brand { width: 42px; height: 42px; display: grid; place-items: center; margin-bottom: 15px; border-radius: 12px; background: #e8f0e4; color: #718b59; font-size: 24px; }
@@ -291,8 +291,10 @@ img { display: block; max-width: 100%; }
 .auth-dialog .form-submit { margin-top: 6px; }
 .auth-switch { width: 100%; margin-top: 16px; padding: 8px; border: 0; background: none; color: #839087; font-size: 10px; cursor: pointer; }
 .auth-switch strong { color: var(--green); }
-.toast { position: fixed; z-index: 50; right: 50%; bottom: 25px; max-width: calc(100% - 32px); padding: 12px 20px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: var(--green-deep); color: white; box-shadow: 0 8px 25px rgba(19, 45, 31, .22); font-size: 12px; opacity: 0; pointer-events: none; transform: translate(50%, 12px); transition: opacity .2s, transform .2s; }
+.error-message { position: relative; z-index: 99999; margin: 0 0 10px; color: #b42318; font-size: 12px; font-weight: 600; line-height: 1.5; }
+.toast { position: fixed; z-index: 99999; right: 50%; bottom: 25px; max-width: calc(100% - 32px); padding: 12px 20px; border: 1px solid rgba(255,255,255,.1); border-radius: 8px; background: var(--green-deep); color: white; box-shadow: 0 8px 25px rgba(19, 45, 31, .22); font-size: 12px; opacity: 0; pointer-events: none; transform: translate(50%, 12px); transition: opacity .2s, transform .2s; }
 .toast.is-visible { opacity: 1; transform: translate(50%, 0); }
+dialog .toast { position: absolute; z-index: 99999; right: 50%; bottom: 16px; }
 
 @media (max-width: 1000px) {
   .main-nav { gap: 21px; margin-inline-end: 24px; }

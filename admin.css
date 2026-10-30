@@ -61,7 +61,7 @@ input:focus, select:focus { outline: 3px solid #205a4326; border-color: #6f9b7d;
 .commission-hint { color: #56805b; font-size: 10px; }
 .empty { padding: 20px; color: var(--muted); text-align: center; font-size: 12px; }
 .manual-form { align-items: end; margin-top: 14px; }
-.toast { position: fixed; z-index: 4; right: 50%; bottom: 20px; max-width: calc(100% - 30px); padding: 12px 18px; border-radius: 9px; background: #183c2b; color: #fff; font-size: 12px; opacity: 0; pointer-events: none; transform: translate(50%, 10px); transition: .2s ease; }
+.toast, .error-message { position: fixed; z-index: 99999; right: 50%; bottom: 20px; max-width: calc(100% - 30px); padding: 12px 18px; border-radius: 9px; background: #183c2b; color: #fff; font-size: 12px; opacity: 0; pointer-events: none; transform: translate(50%, 10px); transition: .2s ease; }
 .toast.visible { opacity: 1; transform: translate(50%, 0); }
 html[data-theme="dark"] {
   color-scheme: dark;

@@ -441,10 +441,16 @@
   }
 
   function showToast(message) {
+    if (!toast) return;
+    const host = document.querySelector("dialog[open]") || document.body;
+    if (toast.parentElement !== host) host.append(toast);
     toast.textContent = message;
     toast.classList.add("is-visible");
     window.clearTimeout(toastTimer);
-    toastTimer = window.setTimeout(() => toast.classList.remove("is-visible"), 3600);
+    toastTimer = window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      if (toast.parentElement !== document.body) document.body.append(toast);
+    }, 4200);
   }
 
   function navigate(page, updateHistory = true) {
@@ -577,6 +583,68 @@
         : digits;
     const national = local.startsWith("0") ? local : `0${local}`;
     return /^01[0125]\d{8}$/.test(national) ? `+20${national.slice(1)}` : "";
+  }
+
+  function accountEmailFromPhone(phone) {
+    return `${String(phone).replace(/\D/g, "")}@accounts.salla7ly.app`;
+  }
+
+  function describeAuthError(error, fallback) {
+    const message = String(error?.message || error?.error_description || "").trim();
+    const lower = message.toLowerCase();
+    if (/already registered|already been registered|user already exists/.test(lower)) {
+      return "هذا الرقم مسجل مسبقًا. استخدم تسجيل الدخول.";
+    }
+    if (/invalid login credentials|invalid credentials/.test(lower)) {
+      return "رقم الموبايل أو كلمة المرور غير صحيحة.";
+    }
+    if (/email not confirmed/.test(lower)) {
+      return "تعذر تفعيل الحساب. عطّل Confirm email في إعدادات Authentication داخل Supabase ثم أعد المحاولة.";
+    }
+    if (/sms|otp|phone provider|unsupported phone|signups not allowed for otp/.test(lower)) {
+      return "التسجيل لا يعتمد على SMS. أعد المحاولة أو تواصل مع الدعم.";
+    }
+    return message || fallback;
+  }
+
+  async function signUpWithoutSms({ phone, password, fullName, nationalId }) {
+    const email = accountEmailFromPhone(phone);
+    const { data, error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName || "",
+          national_id: nationalId || "",
+          phone
+        }
+      }
+    });
+    if (error) return { data, error, email };
+    if (data?.session) return { data, error: null, email };
+    const login = await supabaseClient.auth.signInWithPassword({ email, password });
+    return { data: login.data, error: login.error, email };
+  }
+
+  async function signInWithoutSms({ phone, password }) {
+    const email = accountEmailFromPhone(phone);
+    const result = await supabaseClient.auth.signInWithPassword({ email, password });
+    return { ...result, email };
+  }
+
+  async function persistCustomerProfile({ userId, email, phone, fullName, nationalId }) {
+    if (!userId) return;
+    const { error } = await supabaseClient.from("profiles").upsert({
+      id: userId,
+      email,
+      phone,
+      full_name: fullName || "",
+      national_id: nationalId || ""
+    }, { onConflict: "id" });
+    if (error) {
+      console.error("Could not save the customer profile.", error);
+      showToast("تم إنشاء الحساب لكن تعذر حفظ الاسم أو الرقم القومي. أعد تشغيل سكربت supabase-setup.sql ثم حاول مرة أخرى.");
+    }
   }
 
   function addPasswordField(afterElement, name, labelText, autocomplete = "new-password") {
@@ -793,91 +861,108 @@
     const form = byId("auth-form");
     const nameInput = form.elements.name;
     const phoneInput = form.elements.phone;
-    const nationalId = createFormField("الرقم القومي", "national_id", "text", {
-      inputmode: "numeric",
-      pattern: "[0-9]{14}",
-      maxlength: "14",
-      placeholder: "14 رقمًا"
-    });
-    nationalId.input.required = true;
-    nationalId.input.addEventListener("input", () => {
-      nationalId.input.value = nationalId.input.value
-        .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
-        .replace(/\D/g, "")
-        .slice(0, 14);
-    });
-    phoneInput.closest("label").after(nationalId.label);
-    const passwordInput = addPasswordField(
-      nationalId.label,
-      "password",
-      "كلمة المرور *"
-    );
-    phoneInput.addEventListener("input", () => phoneInput.setCustomValidity(""));
+    const nationalIdInput = form.elements.national_id;
+    const passwordInput = form.elements.password;
+    const authError = byId("auth-error");
+    const submit = form.querySelector(".form-submit");
     const modeButton = document.createElement("button");
     modeButton.type = "button";
     modeButton.className = "text-link auth-mode-toggle";
     modeButton.id = "auth-mode-toggle";
     form.after(modeButton);
-    const submit = form.querySelector(".form-submit");
     let mode = "signup";
+
+    function showAuthError(message) {
+      if (authError) {
+        authError.hidden = !message;
+        authError.textContent = message || "";
+      }
+      if (message) showToast(message);
+    }
 
     function setMode(nextMode) {
       mode = nextMode;
       nameInput.required = mode === "signup";
-      nationalId.input.required = mode === "signup";
+      nationalIdInput.required = mode === "signup";
       nameInput.closest("label").hidden = mode !== "signup";
-      nationalId.label.hidden = mode !== "signup";
+      nationalIdInput.closest("label").hidden = mode !== "signup";
       passwordInput.autocomplete = mode === "signup" ? "new-password" : "current-password";
       passwordInput.minLength = mode === "signup" ? 8 : 1;
       submit.textContent = localized(mode === "signup" ? "إنشاء حساب" : "دخول");
       byId("auth-title").textContent = localized(mode === "signup" ? "إنشاء حساب عميل" : "تسجيل دخول العميل");
-      dialog.querySelector(".auth-description").textContent = localized("استخدم رقم الموبايل وكلمة المرور للدخول دون كود SMS.");
+      dialog.querySelector(".auth-description").textContent = localized("استخدم الاسم ورقم الموبايل والرقم القومي وكلمة المرور دون كود SMS.");
       modeButton.textContent = localized(mode === "signup" ? "لديك حساب؟ تسجيل الدخول" : "حساب جديد؟ سجّل الآن");
+      showAuthError("");
     }
+
+    nationalIdInput.addEventListener("input", () => {
+      nationalIdInput.value = nationalIdInput.value
+        .replace(/[٠-٩]/g, (digit) => String("٠١٢٣٤٥٦٧٨٩".indexOf(digit)))
+        .replace(/\D/g, "")
+        .slice(0, 14);
+    });
+    phoneInput.addEventListener("input", () => phoneInput.setCustomValidity(""));
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
-      if (!form.reportValidity()) return;
-      if (!supabaseConfigured) {
-        showToast("فعّل إعدادات Supabase لحفظ الحسابات وتسجيل الدخول.");
+      event.stopPropagation();
+      showAuthError("");
+      if (!form.reportValidity()) {
+        showAuthError("أكمل الحقول المطلوبة بشكل صحيح قبل المتابعة.");
+        return;
+      }
+      if (!supabaseConfigured || !supabaseClient) {
+        showAuthError("تعذر الاتصال بقاعدة البيانات. راجع إعدادات Supabase ثم أعد المحاولة.");
         return;
       }
       const phone = normalizeEgyptianMobile(phoneInput.value);
       if (!phone) {
         phoneInput.setCustomValidity("اكتب رقم موبايل مصري صحيحًا مثل 01012345678 أو +201012345678.");
         phoneInput.reportValidity();
+        showAuthError("اكتب رقم موبايل مصري صحيحًا مثل 01012345678.");
         return;
       }
       phoneInput.setCustomValidity("");
       phoneInput.value = phone;
-      const result = mode === "signup"
-        ? await supabaseClient.auth.signUp({
-          phone,
-          password: passwordInput.value,
-          options: {
-            data: {
-              full_name: nameInput.value.trim(),
-              national_id: nationalId.input.value.trim()
-            }
-          }
-        })
-        : await supabaseClient.auth.signInWithPassword({
-          phone,
-          password: passwordInput.value
-        });
-      const { error } = result;
-      if (error) {
-        console.error(`Could not ${mode === "signup" ? "register" : "sign in"} the customer.`, error);
-        showToast(error.message || (mode === "signup" ? "تعذر إنشاء الحساب." : "تعذر تسجيل الدخول."));
-        return;
+      const fullName = nameInput.value.trim();
+      const nationalId = nationalIdInput.value.trim();
+      const password = passwordInput.value;
+      submit.disabled = true;
+      try {
+        const result = mode === "signup"
+          ? await signUpWithoutSms({ phone, password, fullName, nationalId })
+          : await signInWithoutSms({ phone, password });
+        if (result.error) {
+          console.error(`Could not ${mode === "signup" ? "register" : "sign in"} the customer.`, result.error);
+          showAuthError(describeAuthError(
+            result.error,
+            mode === "signup" ? "تعذر إنشاء الحساب." : "تعذر تسجيل الدخول."
+          ));
+          return;
+        }
+        if (!result.data?.session) {
+          showAuthError("تم إنشاء المستخدم لكن لم يتم فتح الجلسة. عطّل Confirm email في إعدادات Supabase Authentication.");
+          return;
+        }
+        if (mode === "signup") {
+          await persistCustomerProfile({
+            userId: result.data.user?.id,
+            email: result.email,
+            phone,
+            fullName,
+            nationalId
+          });
+        }
+        form.reset();
+        showAuthError("");
+        dialog.close();
+        showToast(mode === "signup" ? "تم إنشاء حساب العميل بنجاح." : "تم تسجيل الدخول بنجاح.");
+      } catch (error) {
+        console.error("Customer auth submit failed.", error);
+        showAuthError(describeAuthError(error, "حدث خطأ أثناء الاتصال بقاعدة البيانات. حاول مرة أخرى."));
+      } finally {
+        submit.disabled = false;
       }
-      if (mode === "signup" && !result.data.session) {
-        showToast("لم يتم تسجيل الدخول. عطّل Phone confirmations في Supabase، أو بدّل إلى تسجيل الدخول إذا كان الحساب موجودًا.");
-        return;
-      }
-      form.reset();
-      dialog.close();
-      showToast(mode === "signup" ? "تم إنشاء حساب العميل بنجاح." : "تم تسجيل الدخول بنجاح.");
     });
     modeButton.addEventListener("click", () => setMode(mode === "signup" ? "login" : "signup"));
     document.querySelectorAll("[data-auth]").forEach((button) => {
@@ -888,7 +973,7 @@
     });
 
     setMode("signup");
-    dialog.querySelector(".privacy-copy").textContent = "يلزم تعطيل تأكيد الهاتف (Phone confirmations) في إعدادات Supabase لاستخدام الحساب دون SMS.";
+    dialog.querySelector(".privacy-copy").textContent = "يُحفظ الاسم ورقم الموبايل والرقم القومي وكلمة المرور مباشرة دون كود SMS.";
   }
 
   function setupArtisanDashboard() {
@@ -1019,13 +1104,18 @@
       }
       phoneInput.setCustomValidity("");
       phoneInput.value = phone;
-      const { error } = await supabaseClient.auth.signInWithPassword({
-        phone,
-        password: passwordInput.value
-      });
+      let error;
+      try {
+        ({ error } = await signInWithoutSms({
+          phone,
+          password: passwordInput.value
+        }));
+      } catch (signInError) {
+        error = signInError;
+      }
       if (error) {
         console.error("Could not sign in the artisan.", error);
-        showToast(error.message || "تعذر تسجيل الدخول. تأكد من رقم الموبايل وكلمة المرور.");
+        showToast(describeAuthError(error, "تعذر تسجيل الدخول. تأكد من رقم الموبايل وكلمة المرور."));
         return;
       }
       const { data: claimed, error: claimError } = await supabaseClient.rpc("claim_professional_account");
@@ -1915,28 +2005,26 @@
     data.set("phone", localPhone);
     let artisanUserId = null;
     if (supabaseConfigured) {
-      const { data: registration, error: registrationError } = await supabaseClient.auth.signUp({
-        phone: authPhone,
-        password: data.get("account_password"),
-        options: { data: { full_name: String(data.get("name")).trim() } }
-      });
-      if (registrationError) {
-        console.error("Could not create the artisan login.", registrationError);
-        showToast(registrationError.message || "تعذر إنشاء حساب الحرفي.");
-        return;
-      }
-      artisanUserId = registration.user?.id || null;
-      if (!registration.session) {
-        const { data: login, error: loginError } = await supabaseClient.auth.signInWithPassword({
+      try {
+        const registration = await signUpWithoutSms({
           phone: authPhone,
-          password: data.get("account_password")
+          password: String(data.get("account_password") || ""),
+          fullName: String(data.get("name")).trim()
         });
-        if (loginError || !login.session) {
-          if (loginError) console.error("Could not sign in after artisan registration.", loginError);
-          showToast("تعذر تفعيل الحساب دون SMS. عطّل تأكيد الهاتف (Phone confirmations) في إعدادات Supabase، أو استخدم بيانات دخول حسابك الحالي.");
+        if (registration.error) {
+          console.error("Could not create the artisan login.", registration.error);
+          showToast(describeAuthError(registration.error, "تعذر إنشاء حساب الحرفي."));
           return;
         }
-        artisanUserId = login.user.id;
+        artisanUserId = registration.data?.user?.id || null;
+        if (!registration.data?.session) {
+          showToast("تعذر تفعيل الحساب. عطّل Confirm email في إعدادات Supabase Authentication ثم أعد المحاولة.");
+          return;
+        }
+      } catch (registrationError) {
+        console.error("Could not create the artisan login.", registrationError);
+        showToast(describeAuthError(registrationError, "تعذر إنشاء حساب الحرفي."));
+        return;
       }
     }
     let idImage;
