@@ -24,7 +24,7 @@
       <h1 id="auth-title">تسجيل دخول الإدارة</h1>
       <p class="muted" id="auth-description">سجل الدخول بحساب مخول كمدير في Supabase.</p>
       <form id="auth-form">
-        <label>البريد الإلكتروني<input name="email" type="email" autocomplete="email" required placeholder="admin@example.com"></label>
+        <label id="auth-identifier-label">البريد الإلكتروني أو رقم الموبايل<input name="identifier" type="text" autocomplete="username" required placeholder="admin@example.com أو 01012345678"></label>
         <label>كلمة المرور<input name="password" type="password" autocomplete="current-password" required minlength="8"></label>
         <button class="button primary" id="auth-submit" type="submit">دخول</button>
       </form>
@@ -40,15 +40,24 @@
       <div class="metrics" aria-live="polite">
         <article class="metric"><span>كل الطلبات</span><strong id="metric-orders">0</strong></article>
         <article class="metric"><span>قيد المراجعة</span><strong id="metric-pending">0</strong></article>
-        <article class="metric"><span>إجمالي العمليات المدفوعة</span><strong id="metric-paid">0 ج.م</strong></article>
-        <article class="metric accent"><span>حصة الإدارة (20%)</span><strong id="metric-commission">0 ج.م</strong></article>
+        <article class="metric"><span>إجمالي ما دفعه العملاء</span><strong id="metric-paid">0 ج.م</strong></article>
+        <article class="metric accent"><span>رسوم المنصة (10% من كل طرف)</span><strong id="metric-commission">0 ج.م</strong></article>
+        <article class="metric"><span>إجمالي العربونات المقبولة</span><strong id="metric-approved-deposits">0 ج.م</strong></article>
+        <article class="metric accent"><span>أرباح المنصة من العربونات</span><strong id="metric-deposit-profit">0 ج.م</strong></article>
+        <article class="metric"><span>إجمالي التحويلات المعلقة</span><strong id="metric-pending-transfers">0 ج.م</strong></article>
       </div>
 
+      <section class="panel" id="financial-transactions">
+        <div class="panel-heading"><div><h2>التحويلات المالية</h2><p class="muted">راجع إثباتات التحويل قبل تأكيد استلام العربون أو رفضه.</p></div></div>
+        <div id="transactions-list" class="record-list"></div>
+        <p class="empty" id="transactions-empty" hidden>لا توجد تحويلات معلقة للمراجعة.</p>
+      </section>
+
       <section class="panel">
-        <div class="panel-heading"><div><h2>طلبات العملاء والعمليات</h2><p class="muted">أدخل السعر الإجمالي. الإيصالات الإلكترونية تحدّث حالة العربون تلقائيًا؛ راجع طلبات الكاش أو رقم المعاملة من هذه اللوحة. عمولة 20% وصافي الحرفي يُحتسبان تلقائيًا عند إكمال العميل واستلام الخدمة.</p></div></div>
+        <div class="panel-heading"><div><h2>طلبات العملاء والعمليات</h2><p class="muted">أدخل سعر الخدمة الأساسي. يضاف 10% على العميل ويخصم 10% من صافي الحرفي. الإيصالات الإلكترونية تحدّث حالة العربون تلقائيًا.</p></div></div>
         <form class="filters" id="filters-form">
           <label>بحث<input id="search-input" type="search" placeholder="اسم العميل، الهاتف، الحرفة"></label>
-          <label>حالة الطلب<select id="status-filter"><option value="">كل الحالات</option><option>قيد المراجعة</option><option>تم التأكيد</option><option>تم دفع العربون - قيد التنفيذ</option><option>بانتظار تأكيد العميل</option><option>مكتمل نهائياً</option><option>بانتظار مراجعة العربون</option><option>بانتظار مراجعة العربون النقدي</option><option>ملغي</option></select></label>
+          <label>حالة الطلب<select id="status-filter"><option value="">كل الحالات</option><option value="pending">جديد</option><option value="accepted">تم الاتفاق</option><option value="in_progress">في الطريق / قيد التنفيذ</option><option value="completed">مكتمل</option><option value="cancelled">ملغي</option></select></label>
           <label>طريقة الدفع<select id="payment-filter"><option value="">كل طرق الدفع</option><option value="instapay">InstaPay</option><option value="vodafone_cash">Vodafone Cash</option><option value="cash">كاش</option></select></label>
           <button class="button secondary" id="refresh-button" type="button">تحديث</button>
         </form>
@@ -62,7 +71,7 @@
           <label>اسم العميل<input name="customer_name" required></label>
           <label>رقم الهاتف<input name="phone" type="tel" required></label>
           <label>الحرفة / الخدمة<input name="trade" required></label>
-          <label>المبلغ الإجمالي (ج.م)<input name="total_amount" type="number" min="0" step="0.01" required></label>
+          <label>السعر الأساسي للخدمة (ج.م)<input name="service_base_amount" type="number" min="0" step="0.01" required></label>
           <label>طريقة الدفع<select name="payment_method"><option value="">غير محددة</option><option value="instapay">InstaPay</option><option value="vodafone_cash">Vodafone Cash</option><option value="cash">كاش</option></select></label>
           <button class="button primary" type="submit">إضافة العملية</button>
         </form>
@@ -72,6 +81,12 @@
         <div class="panel-heading"><div><h2>طلبات الحرفيين</h2><p class="muted">مستندات الهوية مخزنة في مساحة خاصة ولا يمكن للزوار مشاهدتها.</p></div></div>
         <div id="professionals-list" class="record-list"></div>
         <p class="empty" id="professionals-empty" hidden>لا توجد طلبات حرفيين.</p>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading"><div><h2>مراقبة محادثات الطلبات</h2><p class="muted">سجل الرسائل التمهيدية بين العملاء والحرفيين لمراجعة النزاعات.</p></div><button class="button secondary" id="refresh-chat-button" type="button">تحديث المحادثات</button></div>
+        <div id="chat-logs-list" class="record-list"></div>
+        <p class="empty" id="chat-logs-empty" hidden>لا توجد رسائل مسجلة.</p>
       </section>
 
       <section class="panel">

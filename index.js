@@ -57,7 +57,18 @@
     "أخرى": "photo-1621905251918-48416bd8575a"
   };
   const translations = {
-    "الرئيسية": "Home", "الحرف والخدمات": "Trades & Services", "اطلب خدمة": "Request a Service",
+    "الرئيسية": "Home", "طلباتي": "My Orders", "ومحادثاتي.": "and chats.", "الحرف والخدمات": "Trades & Services", "اطلب خدمة": "Request a Service",
+    "حساب العميل": "Customer account",
+    "تابع طلباتك الحالية والسابقة وافتح المحادثة المباشرة مع الحرفي.": "Track current and previous requests and open a live chat with the professional.",
+    "افتح المحادثة المباشرة": "Open live chat",
+    "تفاصيل الطلب والمحادثة": "Order details and chat",
+    "تابع حالة طلبك وتحدث مباشرةً مع الحرفيين المهتمين.": "Track your order and chat directly with interested professionals.",
+    "لا توجد طلبات مرتبطة بهذا الحساب حتى الآن.": "No requests are linked to this account yet.",
+    "تحتاج قائمة طلباتك إلى تسجيل الدخول وإعداد Supabase.": "Sign in and configure Supabase to view your orders.",
+    "إجمالي العميل:": "Customer total:",
+    "تعذر تحميل طلباتك. تأكد من تحديث قاعدة البيانات.": "Could not load your orders. Make sure the database is up to date.",
+    "قائمة طلبات الحساب تحتاج إعداد Supabase.": "The account orders list requires Supabase configuration.",
+    "تعذر التحقق من الحساب. حاول تسجيل الدخول مرة أخرى.": "Could not verify the account. Please sign in again.",
     "سجّل كحرفي": "Join as a Tradesperson", "لوحة الإدارة": "Dashboard", "سجّل دلوقتي ↗": "Sign up ↗",
     "طلبك يوصل لصاحب الموقع للمراجعة — مفيش فنيين من غير موافقتك": "Your request goes to the site owner for review — no tradesperson appears without approval",
     "اختار خدمة ←": "Browse services ←", "من الحرفي لحد باب بيتك": "From skilled hands to your doorstep",
@@ -68,6 +79,10 @@
     "تفاصيل كل حرفة قدامك": "Explore each trade and service", "لا يظهر حرفي قبل اعتمادك": "Professionals appear only after approval",
     "فني يعمل على إصلاحات منزلية": "Home repair professional at work", "فني صيانة يعمل على إصلاح كهرباء منزلية": "A professional repairing home electrical systems",
     "حرفي شاطر، وشغل يطمن": "Skilled hands. Work you can trust", "بيتك": "Your home", "أمانة": "In good hands",
+    "في حرفي متصل قريب منك": "A professional is online nearby",
+    "تم إرسال طلبك للحرفيين المطابقين": "Your request was sent to matching professionals",
+    "لقينا حرفيين معتمدين ومتصلين في منطقتك. ستظهر عروض الأسعار ووقت الوصول هنا، وتظهر بيانات التواصل بعد تأكيد الحجز.": "Approved professionals are online nearby. Offers and arrival times will appear here; contact details are shown after booking confirmation.",
+    "تم تسجيل طلبك وسيظهر للحرفيين المعتمدين في منطقتك عند اتصالهم.": "Your request is registered and will appear to approved local professionals when they come online.",
     "شغل بيتك يبدأ بخطوة": "A better home starts with one step", "من كل محافظة": "Across every governorate",
     "حرفة مناسبة لبيتك": "The right trade for your home", "كل الحرف ←": "All trades ←", "كل الحرف": "All trades",
     "دليل الحرف والخدمات": "Trade & service directory", "اختار الحرفة،": "Choose a trade,", "وشوف تفاصيلها.": "see what we can do.",
@@ -92,8 +107,16 @@
     "اختيارك": "Your choice", "يوصل لصاحب الموقع ✳": "Goes to the site owner ✳",
     "ابحث في الحرف": "Search trades", "دور على حرفة أو خدمة...": "Search for a trade or service...",
     "ملقيناش الحرفة دي. جرّب كلمة تانية.": "No matching trade found. Try another search.",
+    "الحرفيون المتاحون": "Available professionals",
+    "حرفيون جاهزون": "Professionals ready",
+    "في منطقتك.": "in your area.",
+    "كل المناطق": "All areas",
+    "المحافظة / المنطقة": "Governorate / area",
+    "متصل ومتاح": "Online and available",
+    "لا يوجد حرفيون متصلون حاليًا.": "No professionals are online right now.",
+    "لا يوجد حرفيون متاحون في المنطقة المختارة.": "No available professionals in the selected area.",
     "طلبك يوصل لصاحب الموقع": "Your request goes to the site owner", "قولنا محتاج": "Tell us what you need",
-    "إيه وفين.": "and where.", "حدد الحرفة والمحافظة والمنطقة والعنوان. صاحب الموقع يراجع الطلب ويتابع معاك.": "Choose a trade, governorate, district and address. The site owner will review and follow up.",
+    "إيه وفين.": "and where.", "حدد المحافظة والمنطقة والعنوان أو استخدم GPS. صاحب الموقع يراجع الطلب ويتابع معاك.": "Choose governorate and district, enter the address or use GPS. The site owner will review and follow up.",
     "اختار الحرفة والخدمة": "Choose a trade and service", "حدد نوع الشغل بالتفصيل": "Select the specific work",
     "حدد المحافظة والمنطقة": "Choose governorate and district", "واكتب العنوان بالتفصيل": "Enter your full address",
     "صاحب الموقع يراجع الطلب": "The site owner reviews your request", "ويتابع معاك الخطوة الجاية": "and follows up on next steps",
@@ -105,6 +128,16 @@
     "اختار المنطقة أو المركز": "Choose a district or city", "اختار المحافظة الأول": "Choose a governorate first",
     "منطقة أخرى / غير مدرجة": "Other / not listed", "اكتب اسم المنطقة أو المركز": "Enter district or city",
     "الشارع والعنوان بالتفصيل": "Street and full address", "اسم الشارع، رقم العمارة، الدور، علامة مميزة...": "Street, building, floor, nearby landmark...",
+    "استخدم موقعي الحالي": "Use my current location",
+    "أدخل العنوان يدويًا أو حدّد موقعك عبر GPS.": "Enter the address or pin your location using GPS.",
+    "جارٍ تحديد موقعك...": "Getting your location...",
+    "تم تحديد موقعك وإرفاقه بالطلب.": "Your location has been pinned to the request.",
+    "تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى.": "Could not access your location. Enter the address manually or try again.",
+    "السعر المقترح / ميزانيتك (جنيه)": "Proposed price / your budget (EGP)",
+    "اختياري — مثال: 500": "Optional — e.g. 500",
+    "السعر المقترح من العميل": "Customer's proposed price",
+    "عرض الموقع على الخريطة": "View location on map",
+    "تأكد من تشغيل supabase-setup.sql لتحديث أعمدة الطلب ثم أعد المحاولة.": "Run supabase-setup.sql to update the service-order columns, then try again.",
     "وصف إضافي للشغل": "Additional work details", "اشرح المشكلة أو المطلوب والوقت المناسب...": "Describe the work and a suitable time...",
     "اسم العميل": "Customer name", "الاسم بالكامل": "Full name", "رقم الموبايل": "Mobile number",
     "01xxxxxxxxx": "01xxxxxxxxx", "اكتب رقم موبايل مصري صحيح": "Enter a valid Egyptian mobile number",
@@ -255,6 +288,7 @@
     "وضع تجريبي محلي: بيانات وصور الهوية لا تُرفع إلى خادم.": "Local demo: personal details and ID images are not uploaded to a server.",
     "طريقة الدفع": "Payment method",
     "اختار وسيلة الدفع المناسبة. التحويل يتم يدويًا بعد تأكيد السعر.": "Choose a payment option. Transfers are manual after the price is confirmed.",
+    "تم تأكيد عربونك بنجاح": "Your deposit has been confirmed successfully.",
     "طريقة الدفع المفضلة": "Preferred payment method",
     "اختار طريقة الدفع": "Choose a payment method",
     "كاش عند تقديم الخدمة": "Cash when service is provided",
@@ -268,6 +302,8 @@
     "يمكنك اختيار حتى 5 صور، بحد أقصى 5 ميجابايت للصورة.": "Select up to 5 photos, with a 5 MB maximum per image.",
     "طريقة استلام الأرباح": "Payout method",
     "اختار طريقة استلام الأرباح": "Choose a payout method",
+    "رقم محفظة Vodafone Cash": "Vodafone Cash wallet number",
+    "رقم الهاتف أو الحساب المرتبط بـ InstaPay": "Phone number or InstaPay account",
     "كاش": "Cash",
     "الرقم القومي": "National ID",
     "14 رقمًا": "14 digits",
@@ -275,6 +311,24 @@
     "تأكيد الكود": "Verify code",
     "تسجيل دخول العميل": "Customer login",
     "إنشاء حساب عميل": "Create customer account",
+    "استخدم رقم الموبايل وكلمة المرور فقط. لا يلزم رمز تحقق عند تسجيل الدخول.": "Sign in with your mobile number and password only. No verification code is required.",
+    "سيُنشأ الحساب ببريد داخلي مرتبط برقم الهاتف دون إرسال SMS.": "An internal email alias will be created for your phone number; no SMS is sent.",
+    "يُنشأ حساب الحرفي ببريد داخلي مرتبط برقم الهاتف دون SMS. بيانات الهوية ومعرض الأعمال مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير.": "The professional account uses an internal email alias linked to the phone number, without SMS. ID and portfolio images are stored privately and accessible only to authorized admins.",
+    "التسجيل والدخول برقم الهاتف وكلمة المرور دون SMS؛ استعادة SMS تتطلب مزودًا ورقم هاتف موثقًا في Supabase، والحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.": "Sign-up and login use your phone number and password without SMS. SMS recovery requires a provider and a verified Supabase phone; local alias accounts cannot receive SMS.",
+    "نسيت كلمة المرور؟": "Forgot password?",
+    "إعادة تعيين كلمة المرور": "Reset password",
+    "استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.": "SMS recovery is available only for accounts linked to a verified Supabase phone; local alias accounts cannot receive SMS.",
+    "رمز التحقق": "Verification code",
+    "كلمة المرور الجديدة": "New password",
+    "إرسال رمز التحقق": "Send verification code",
+    "العودة لتسجيل الدخول": "Back to sign in",
+    "تأكيد رقم الهاتف": "Verify phone number",
+    "بيانات التواصل تظهر بعد تأكيد الحجز.": "Contact details appear after the booking is confirmed.",
+    "سيظهر رقم التحويل بعد تأكيد الحجز.": "The transfer number will appear after the booking is confirmed.",
+    "تنبيه: التحويل إلى InstaPay أو Vodafone Cash يتم مباشرةً إلى حساب الحرفي أو رقم الاستقبال البديل بعد تأكيد الحجز. لا تحتجز المنصة الأموال فعليًا.": "Note: InstaPay and Vodafone Cash transfers go directly to the professional's account or the fallback recipient after booking confirmation. The platform does not hold funds.",
+    "رقم الحرفي بعد تأكيد الحجز": "Professional number after booking confirmation",
+    "رقم العميل بعد تأكيد الحجز": "Customer number after booking confirmation",
+    "أدخل رمز SMS المرسل إلى": "Enter the SMS code sent to",
     "سنرسل كود تحقق إلى رقم موبايلك.": "We will send a verification code to your phone.",
     "لديك حساب؟ تسجيل الدخول": "Already have an account? Log in",
     "حساب جديد؟ سجّل الآن": "New here? Sign up",
@@ -391,7 +445,7 @@
     "سوهاج": ["مدينة سوهاج", "أخميم", "جرجا", "طهطا", "المراغة", "البلينا", "المنشأة", "دار السلام", "ساقلتة", "طما"]
   };
 
-  const pageNames = new Set(["home", "services", "request", "join", "artisan"]);
+  const pageNames = new Set(["home", "services", "request", "join", "artisan", "orders"]);
   const supportPhone = "01068076603";
   const paymentPhone = "01063459472";
   const currencyFormatter = new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 });
@@ -409,6 +463,7 @@
   let selectedRating = 0;
   let selectedTrade = "";
   let requestedGovernorate = "";
+  let pendingOrdersOpen = false;
   let idImagePromise = Promise.resolve("");
   const byId = (id) => document.getElementById(id);
   const supabaseClient = window.salla7lySupabase;
@@ -586,7 +641,7 @@
   }
 
   function accountEmailFromPhone(phone) {
-    return `${String(phone).replace(/\D/g, "")}@accounts.salla7ly.app`;
+    return `${String(phone).replace(/\D/g, "")}@app.local`;
   }
 
   function describeAuthError(error, fallback) {
@@ -602,12 +657,24 @@
       return "تعذر تفعيل الحساب. عطّل Confirm email في إعدادات Authentication داخل Supabase ثم أعد المحاولة.";
     }
     if (/sms|otp|phone provider|unsupported phone|signups not allowed for otp/.test(lower)) {
-      return "التسجيل لا يعتمد على SMS. أعد المحاولة أو تواصل مع الدعم.";
+      return "تعذر التحقق عبر SMS. تأكد من إعداد مزود الرسائل وتفعيل تسجيل الهاتف في Supabase.";
     }
     return message || fallback;
   }
 
-  async function signUpWithoutSms({ phone, password, fullName, nationalId }) {
+  function describePhoneLoginError(error, fallback) {
+    const message = String(error?.message || error?.error_description || "").trim();
+    const lower = message.toLowerCase();
+    if (/invalid login credentials|invalid credentials/.test(lower)) {
+      return "رقم الموبايل أو كلمة المرور غير صحيحة.";
+    }
+    if (/sms|otp|phone provider/.test(lower)) {
+      return "تعذر تسجيل الدخول برقم الهاتف وكلمة المرور. تحقق من إعداد تسجيل الهاتف في Supabase.";
+    }
+    return message || fallback;
+  }
+
+  async function signUpCustomerAccount({ phone, password, fullName, nationalId }) {
     const email = accountEmailFromPhone(phone);
     const { data, error } = await supabaseClient.auth.signUp({
       email,
@@ -626,10 +693,24 @@
     return { data: login.data, error: login.error, email };
   }
 
-  async function signInWithoutSms({ phone, password }) {
-    const email = accountEmailFromPhone(phone);
-    const result = await supabaseClient.auth.signInWithPassword({ email, password });
-    return { ...result, email };
+  async function signInWithPhone({ phone, password }) {
+    const digits = String(phone).replace(/\D/g, "");
+    const currentEmail = accountEmailFromPhone(phone);
+    const legacyEmails = [`${digits}@accounts.salla7ly.app`];
+    let result = await supabaseClient.auth.signInWithPassword({
+      email: currentEmail,
+      password
+    });
+    if (!result.error || !/invalid login credentials|invalid credentials/i.test(result.error.message || "")) {
+      return result;
+    }
+    for (const email of legacyEmails) {
+      result = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (!result.error || !/invalid login credentials|invalid credentials/i.test(result.error.message || "")) {
+        return result;
+      }
+    }
+    return supabaseClient.auth.signInWithPassword({ phone, password });
   }
 
   async function persistCustomerProfile({ userId, email, phone, fullName, nationalId }) {
@@ -660,6 +741,37 @@
 
   function setupRequestExperience() {
     const form = byId("request-form");
+    const locationButton = byId("request-location-button");
+    const locationStatus = byId("request-location-status");
+    const latitudeInput = byId("request-location-latitude");
+    const longitudeInput = byId("request-location-longitude");
+    locationButton.textContent = localized("استخدم موقعي الحالي");
+    const resetLocationStatus = () => {
+      locationStatus.textContent = localized("أدخل العنوان يدويًا أو حدّد موقعك عبر GPS.");
+    };
+    locationButton.addEventListener("click", () => {
+      if (!navigator.geolocation) {
+        locationStatus.textContent = localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى.");
+        showToast(localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى."));
+        return;
+      }
+      locationButton.disabled = true;
+      latitudeInput.value = "";
+      longitudeInput.value = "";
+      locationStatus.textContent = localized("جارٍ تحديد موقعك...");
+      navigator.geolocation.getCurrentPosition(({ coords }) => {
+        latitudeInput.value = String(coords.latitude);
+        longitudeInput.value = String(coords.longitude);
+        locationStatus.textContent = localized("تم تحديد موقعك وإرفاقه بالطلب.");
+        locationButton.disabled = false;
+      }, (error) => {
+        console.error("Could not get the customer's location.", error);
+        locationStatus.textContent = localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى.");
+        showToast(localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى."));
+        locationButton.disabled = false;
+      }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+    });
+    form.addEventListener("reset", resetLocationStatus);
     byId("payment-method").closest(".form-label").remove();
     byId("payment-instructions").remove();
 
@@ -676,7 +788,7 @@
     guarantee.append(
       textElement("strong", "", "🛡️ ضمان صلحلي"),
       textElement("p", "", "تدفع 50% عربون إلكترونيًا بعد اعتماد السعر، والباقي بعد تنفيذ الخدمة. لا تُصرف مستحقات الحرفي من المنصة قبل تأكيدك رضاك واستلام الخدمة."),
-      textElement("small", "", "تنبيه: التحويل إلى InstaPay أو Vodafone Cash في النسخة الحالية يتم مباشرةً إلى رقم الاستقبال، ولا تحتجز المنصة الأموال فعليًا. يلزم ربط بوابة دفع/حساب ضمان لتفعيل الحجز والإفراج الآلي.")
+      textElement("small", "", localized("تنبيه: التحويل إلى InstaPay أو Vodafone Cash يتم مباشرةً إلى حساب الحرفي أو رقم الاستقبال البديل بعد تأكيد الحجز. لا تحتجز المنصة الأموال فعليًا."))
     );
     section.append(guarantee);
     const methodLabel = document.createElement("label");
@@ -749,6 +861,13 @@
     trackingStatus.id = "customer-tracking-status";
     const amounts = textElement("p", "tracking-amounts", "");
     amounts.id = "customer-tracking-amounts";
+    const inquiry = document.createElement("section");
+    inquiry.id = "customer-inquiry";
+    inquiry.className = "customer-inquiry";
+    inquiry.hidden = true;
+    const professionalContact = textElement("p", "professional-contact", "");
+    professionalContact.id = "customer-professional-contact";
+    professionalContact.hidden = true;
     const depositForm = document.createElement("form");
     depositForm.id = "deposit-payment-form";
     depositForm.className = "final-payment-form";
@@ -790,7 +909,7 @@
     confirmButton.className = "button button-primary";
     confirmButton.textContent = "تأكيد واستلام الخدمة";
     finalPayment.append(confirmButton);
-    tracking.append(trackingHeading, trackingStatus, amounts, depositForm, finalPayment);
+    tracking.append(trackingHeading, trackingStatus, professionalContact, amounts, inquiry, depositForm, finalPayment);
     byId("availability-workers").before(tracking);
     const trackButton = document.createElement("button");
     trackButton.type = "button";
@@ -854,6 +973,34 @@
     ].forEach(([label, value]) => payout.add(new Option(label, value)));
     payoutLabel.append(payout);
     joinForm.querySelector(".checkbox-label").before(payoutLabel);
+    const payoutAccount = createFormField("بيانات حساب استلام الأرباح", "payout_account", "text", {
+      autocomplete: "off",
+      placeholder: "أدخل رقم المحفظة أو حساب InstaPay"
+    });
+    payoutAccount.input.id = "payout-account";
+    payoutAccount.label.hidden = true;
+    payoutAccount.input.required = false;
+    payoutLabel.after(payoutAccount.label);
+    payout.addEventListener("change", () => {
+      const needsAccount = ["instapay", "vodafone_cash"].includes(payout.value);
+      payoutAccount.label.hidden = !needsAccount;
+      payoutAccount.input.required = needsAccount;
+      if (payout.value === "vodafone_cash") {
+        payoutAccount.input.type = "tel";
+        payoutAccount.input.inputMode = "tel";
+        payoutAccount.input.pattern = "01[0125][0-9]{8}";
+        payoutAccount.input.maxLength = 11;
+      } else {
+        payoutAccount.input.type = "text";
+        payoutAccount.input.inputMode = "text";
+        payoutAccount.input.removeAttribute("pattern");
+        payoutAccount.input.removeAttribute("maxlength");
+      }
+      payoutAccount.label.firstChild.textContent = localized(payout.value === "vodafone_cash"
+        ? "رقم محفظة Vodafone Cash"
+        : "رقم الهاتف أو الحساب المرتبط بـ InstaPay");
+      if (!needsAccount) payoutAccount.input.value = "";
+    });
   }
 
   function setupCustomerAuth() {
@@ -865,12 +1012,17 @@
     const passwordInput = form.elements.password;
     const authError = byId("auth-error");
     const submit = form.querySelector(".form-submit");
+    const resetForm = byId("password-reset-form");
+    const resetToggle = byId("auth-reset-toggle");
+    const resetError = byId("reset-error");
+    const resetSubmit = resetForm.querySelector(".form-submit");
     const modeButton = document.createElement("button");
     modeButton.type = "button";
     modeButton.className = "text-link auth-mode-toggle";
     modeButton.id = "auth-mode-toggle";
     form.after(modeButton);
     let mode = "signup";
+    let resetStep = "request";
 
     function showAuthError(message) {
       if (authError) {
@@ -880,18 +1032,33 @@
       if (message) showToast(message);
     }
 
+    function showResetError(message) {
+      resetError.hidden = !message;
+      resetError.textContent = message || "";
+      if (message) showToast(message);
+    }
+
     function setMode(nextMode) {
       mode = nextMode;
       nameInput.required = mode === "signup";
       nationalIdInput.required = mode === "signup";
       nameInput.closest("label").hidden = mode !== "signup";
       nationalIdInput.closest("label").hidden = mode !== "signup";
+      phoneInput.readOnly = false;
       passwordInput.autocomplete = mode === "signup" ? "new-password" : "current-password";
       passwordInput.minLength = mode === "signup" ? 8 : 1;
       submit.textContent = localized(mode === "signup" ? "إنشاء حساب" : "دخول");
       byId("auth-title").textContent = localized(mode === "signup" ? "إنشاء حساب عميل" : "تسجيل دخول العميل");
-      dialog.querySelector(".auth-description").textContent = localized("استخدم الاسم ورقم الموبايل والرقم القومي وكلمة المرور دون كود SMS.");
+      dialog.querySelector(".auth-description").textContent = localized(
+        mode === "signup"
+          ? "سيُنشأ الحساب ببريد داخلي مرتبط برقم الهاتف دون إرسال SMS."
+          : "استخدم رقم الموبايل وكلمة المرور فقط. لا يلزم رمز تحقق عند تسجيل الدخول."
+      );
       modeButton.textContent = localized(mode === "signup" ? "لديك حساب؟ تسجيل الدخول" : "حساب جديد؟ سجّل الآن");
+      modeButton.hidden = false;
+      resetToggle.hidden = mode !== "login";
+      form.hidden = false;
+      resetForm.hidden = true;
       showAuthError("");
     }
 
@@ -929,34 +1096,38 @@
       const password = passwordInput.value;
       submit.disabled = true;
       try {
-        const result = mode === "signup"
-          ? await signUpWithoutSms({ phone, password, fullName, nationalId })
-          : await signInWithoutSms({ phone, password });
+        const action = mode;
+        const result = action === "signup"
+          ? await signUpCustomerAccount({ phone, password, fullName, nationalId })
+          : await signInWithPhone({ phone, password });
         if (result.error) {
-          console.error(`Could not ${mode === "signup" ? "register" : "sign in"} the customer.`, result.error);
-          showAuthError(describeAuthError(
-            result.error,
-            mode === "signup" ? "تعذر إنشاء الحساب." : "تعذر تسجيل الدخول."
-          ));
+          console.error(`Could not ${action === "signup" ? "register" : "sign in"} the customer.`, result.error);
+          showAuthError(action === "signup"
+            ? describeAuthError(result.error, "تعذر إنشاء الحساب.")
+            : describePhoneLoginError(result.error, "تعذر تسجيل الدخول."));
           return;
         }
         if (!result.data?.session) {
           showAuthError("تم إنشاء المستخدم لكن لم يتم فتح الجلسة. عطّل Confirm email في إعدادات Supabase Authentication.");
           return;
         }
-        if (mode === "signup") {
-          await persistCustomerProfile({
-            userId: result.data.user?.id,
-            email: result.email,
-            phone,
-            fullName,
-            nationalId
-          });
-        }
+        if (action === "signup") await persistCustomerProfile({
+          userId: result.data.user?.id,
+          email: result.email,
+          phone,
+          fullName,
+          nationalId
+        });
         form.reset();
         showAuthError("");
+        const shouldOpenOrders = pendingOrdersOpen;
+        pendingOrdersOpen = false;
         dialog.close();
-        showToast(mode === "signup" ? "تم إنشاء حساب العميل بنجاح." : "تم تسجيل الدخول بنجاح.");
+        showToast(action === "signup" ? "تم إنشاء حساب العميل بنجاح." : "تم تسجيل الدخول بنجاح.");
+        if (shouldOpenOrders) {
+          navigate("orders");
+          await loadCustomerOrders();
+        }
       } catch (error) {
         console.error("Customer auth submit failed.", error);
         showAuthError(describeAuthError(error, "حدث خطأ أثناء الاتصال بقاعدة البيانات. حاول مرة أخرى."));
@@ -965,15 +1136,108 @@
       }
     });
     modeButton.addEventListener("click", () => setMode(mode === "signup" ? "login" : "signup"));
+    resetToggle.addEventListener("click", () => {
+      setMode("login");
+      resetStep = "request";
+      resetForm.reset();
+      resetForm.querySelector('[data-reset-field="otp"]').hidden = true;
+      resetForm.querySelector('[data-reset-field="password"]').hidden = true;
+      resetForm.elements.otp.required = false;
+      resetForm.elements.password.required = false;
+      resetSubmit.textContent = "إرسال رمز التحقق";
+      showResetError("");
+      form.hidden = true;
+      modeButton.hidden = true;
+      resetToggle.hidden = true;
+      resetForm.hidden = false;
+      byId("auth-title").textContent = "إعادة تعيين كلمة المرور";
+      dialog.querySelector(".auth-description").textContent = localized("استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.");
+      resetForm.querySelector(".privacy-copy").textContent = localized("استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.");
+    });
+    byId("auth-reset-back").addEventListener("click", () => setMode("login"));
+    resetForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      showResetError("");
+      if (!supabaseConfigured || !supabaseClient) {
+        showResetError("إعادة التعيين تحتاج إعداد Supabase ومزود رسائل SMS.");
+        return;
+      }
+      if (!resetForm.reportValidity()) return;
+      const resetPhone = normalizeEgyptianMobile(resetForm.elements.phone.value);
+      if (!resetPhone) {
+        showResetError("اكتب رقم موبايل مصري صحيحًا.");
+        return;
+      }
+      resetForm.elements.phone.value = resetPhone;
+      resetSubmit.disabled = true;
+      try {
+        if (resetStep === "request") {
+          const { error } = await supabaseClient.auth.signInWithOtp({
+            phone: resetPhone,
+            options: { shouldCreateUser: false }
+          });
+          if (error) {
+            console.error("Could not send the password reset SMS.", error);
+            showResetError("تعذر إرسال رمز التحقق. تأكد من تسجيل الهاتف وتفعيل مزود SMS.");
+            return;
+          }
+          resetStep = "verify";
+          resetForm.querySelector('[data-reset-field="otp"]').hidden = false;
+          resetForm.querySelector('[data-reset-field="password"]').hidden = false;
+          resetForm.elements.otp.required = true;
+          resetForm.elements.password.required = true;
+          resetSubmit.textContent = "تأكيد الرمز وتغيير كلمة المرور";
+          showToast("أرسلنا رمز التحقق إلى رقم الموبايل.");
+          return;
+        }
+        if (resetStep === "verify") {
+          const { error: verificationError } = await supabaseClient.auth.verifyOtp({
+            phone: resetPhone,
+            token: resetForm.elements.otp.value.trim(),
+            type: "sms"
+          });
+          if (verificationError) {
+            console.error("Could not verify the password reset code.", verificationError);
+            showResetError("رمز التحقق غير صحيح أو منتهي الصلاحية.");
+            return;
+          }
+          resetStep = "update";
+        }
+        const { error: passwordError } = await supabaseClient.auth.updateUser({
+          password: resetForm.elements.password.value
+        });
+        if (passwordError) {
+          console.error("Could not update the password after phone verification.", passwordError);
+          showResetError(describeAuthError(passwordError, "تعذر تحديث كلمة المرور."));
+          return;
+        }
+        resetForm.reset();
+        resetStep = "request";
+        setMode("login");
+        dialog.close();
+        showToast("تم تغيير كلمة المرور وتسجيل الدخول.");
+      } catch (error) {
+        console.error("Phone password recovery failed.", error);
+        showResetError(describeAuthError(error, "حدث خطأ أثناء إعادة تعيين كلمة المرور."));
+      } finally {
+        resetSubmit.disabled = false;
+      }
+    });
     document.querySelectorAll("[data-auth]").forEach((button) => {
       button.addEventListener("click", () => {
+        resetForm.hidden = true;
         setMode(button.dataset.auth === "login" ? "login" : "signup");
         dialog.showModal();
       });
     });
+    dialog.addEventListener("close", () => {
+      pendingOrdersOpen = false;
+      form.reset();
+      setMode("login");
+    });
 
     setMode("signup");
-    dialog.querySelector(".privacy-copy").textContent = "يُحفظ الاسم ورقم الموبايل والرقم القومي وكلمة المرور مباشرة دون كود SMS.";
+    byId("auth-privacy-copy").textContent = localized("التسجيل والدخول برقم الهاتف وكلمة المرور دون SMS؛ استعادة SMS تتطلب مزودًا ورقم هاتف موثقًا في Supabase، والحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.");
   }
 
   function setupArtisanDashboard() {
@@ -982,7 +1246,7 @@
     section.id = "page-artisan";
     section.dataset.page = "artisan";
     section.hidden = true;
-    section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل وكلمة المرور المسجلين بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx أو +201xxxxxxxxx" required></label><label class="form-label">كلمة المرور<input id="artisan-password" type="password" autocomplete="current-password" minlength="8" placeholder="8 أحرف أو أرقام على الأقل" required></label><button class="button button-primary" id="artisan-login" type="button">دخول</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
+    section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل وكلمة المرور المسجلين بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx أو +201xxxxxxxxx" required></label><label class="form-label">كلمة المرور<input id="artisan-password" type="password" autocomplete="current-password" minlength="8" placeholder="8 أحرف أو أرقام على الأقل" required></label><button class="button button-primary" id="artisan-login" type="button">دخول</button><button class="text-link artisan-forgot-password" id="artisan-forgot-password" type="button">نسيت كلمة المرور؟</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
     document.querySelector("main").append(section);
     const link = document.createElement("a");
     link.className = "nav-link";
@@ -991,18 +1255,14 @@
     link.textContent = "حساب الحرفي";
     nav.append(link);
 
-    const dialog = document.createElement("dialog");
-    dialog.className = "auth-dialog";
-    dialog.id = "artisan-accept-dialog";
-    dialog.innerHTML = '<button type="button" class="dialog-close" data-dialog-close aria-label="إغلاق">×</button><div class="eyebrow">تأكيد استلام الطلب</div><h2>وقت الوصول المتوقع</h2><form id="artisan-accept-form"><label class="form-label">الوقت بالدقائق<input name="arrival_minutes" type="number" min="1" max="1440" step="1" required placeholder="مثال: 30"></label><button class="button button-primary form-submit" type="submit">قبول الطلب</button></form>';
-    document.body.append(dialog);
-    let acceptedMatchId = "";
     let matchesChannel = null;
+    let presenceChannel = null;
+    const inquiryChannels = new Map();
 
     async function loadMatches() {
       const host = byId("artisan-orders");
       const { data, error } = await supabaseClient.from("service_order_matches")
-        .select("id, status, service_orders(id, trade, services, governorate, area, address, details, cash_location_details, area_size_sqm, payment_method, created_at, status, estimated_arrival_minutes)")
+        .select("id, status, service_orders(id, trade, services, governorate, area, address, location_latitude, location_longitude, proposed_price, details, cash_location_details, area_size_sqm, payment_method, created_at, status, estimated_arrival_minutes)")
         .order("created_at", { ascending: false });
       if (error) {
         console.error("Could not load matching service orders.", error);
@@ -1011,9 +1271,9 @@
       }
       host.replaceChildren();
       if (!data.length) host.append(textElement("p", "empty-state", "لا توجد طلبات مطابقة لمنطقتك وتخصصك حاليًا."));
-      data.forEach((match) => {
+      for (const match of data) {
         const order = match.service_orders;
-        if (!order) return;
+        if (!order) continue;
         const card = document.createElement("article");
         card.className = "artisan-order-card";
         const services = Array.isArray(order.services) ? order.services.join("، ") : "";
@@ -1022,17 +1282,47 @@
           textElement("span", "", `${order.governorate}، ${order.area} · ${order.address}`),
           textElement("span", "", [order.details, order.cash_location_details, order.area_size_sqm ? `المساحة ${order.area_size_sqm} م²` : ""].filter(Boolean).join(" · "))
         );
-        if (match.status === "matched") {
-          const accept = document.createElement("button");
-          accept.type = "button";
-          accept.className = "button button-primary";
-          accept.textContent = "قبول الطلب";
-          accept.addEventListener("click", () => {
-            acceptedMatchId = match.id;
-            dialog.showModal();
+        if (order.proposed_price !== null && order.proposed_price !== undefined) {
+          card.append(textElement(
+            "strong",
+            "proposed-price",
+            `${localized("السعر المقترح من العميل")}: ${currencyFormatter.format(Number(order.proposed_price))} ج.م`
+          ));
+        }
+        const latitude = order.location_latitude === null || order.location_latitude === undefined
+          ? Number.NaN
+          : Number(order.location_latitude);
+        const longitude = order.location_longitude === null || order.location_longitude === undefined
+          ? Number.NaN
+          : Number(order.location_longitude);
+        if (Number.isFinite(latitude) && Math.abs(latitude) <= 90
+          && Number.isFinite(longitude) && Math.abs(longitude) <= 180) {
+          const mapLink = document.createElement("a");
+          mapLink.className = "artisan-order-location";
+          mapLink.href = `https://www.google.com/maps?q=${encodeURIComponent(`${latitude},${longitude}`)}`;
+          mapLink.target = "_blank";
+          mapLink.rel = "noopener noreferrer";
+          mapLink.textContent = localized("عرض الموقع على الخريطة");
+          card.append(mapLink);
+        }
+        if (match.status === "accepted") {
+          const { data: contact, error: contactError } = await supabaseClient.rpc("get_accepted_order_contact", {
+            p_match_id: match.id
           });
-          card.append(accept);
-        } else if (match.status === "accepted" && order.status === "تم دفع العربون - قيد التنفيذ") {
+          if (contactError) {
+            console.error("Could not load the confirmed customer's contact number.", contactError);
+            showToast("تعذر تحميل رقم العميل بعد تأكيد الحجز.");
+          } else if (contact?.customer_phone) {
+            const phone = String(contact.customer_phone).replace(/[^\d+]/g, "");
+            const call = document.createElement("a");
+            call.className = "confirmed-customer-contact";
+            call.href = `tel:${phone}`;
+            call.textContent = `${localized("رقم العميل بعد تأكيد الحجز")}: ${contact.customer_phone}`;
+            card.append(call);
+          }
+        }
+        await appendProfessionalInquiry(match, order, card);
+        if (match.status === "accepted" && order.status === "تم دفع العربون - قيد التنفيذ") {
           const complete = document.createElement("button");
           complete.type = "button";
           complete.className = "button button-primary";
@@ -1058,8 +1348,138 @@
           card.append(textElement("span", "record-status", "تم إسناد الطلب إلى حرفي آخر."));
         }
         host.append(card);
-      });
+      }
       host.hidden = false;
+    }
+
+    async function appendProfessionalInquiry(match, order, card) {
+      if (!inquiryChannels.has(order.id)) {
+        const channel = supabaseClient.channel(`service-inquiry:${order.id}`, {
+          config: { private: false }
+        }).on("broadcast", { event: "inquiry_updated" }, ({ payload }) => {
+          if (payload?.order_id === order.id) void loadMatches();
+        }).subscribe((status) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.error("Could not subscribe to the matched service inquiry.", status);
+            showToast("تعذر تفعيل تحديث المحادثة الفوري.");
+          }
+        });
+        inquiryChannels.set(order.id, channel);
+      }
+      const { data: inquiry, error } = await supabaseClient.rpc("get_professional_inquiry", {
+        p_match_id: match.id
+      });
+      if (error) {
+        console.error("Could not load professional inquiry details.", error);
+        card.append(textElement("span", "record-status", "تعذر تحميل المحادثة والعرض."));
+        return;
+      }
+      if (!inquiry) return;
+      const conversation = document.createElement("section");
+      conversation.className = "artisan-conversation";
+      conversation.append(textElement("strong", "", "محادثة الطلب وعرض السعر"));
+      if (inquiry.offer) {
+        const offer = inquiry.offer;
+        const base = Number(offer.service_base_amount);
+        conversation.append(textElement(
+          "p",
+          "offer-breakdown",
+          `السعر الأساسي: ${currencyFormatter.format(base)} ج.م - رسوم المنصة 10% (${currencyFormatter.format(base * 0.10)} ج.م) = صافي مستحقك: ${currencyFormatter.format(base * 0.90)} ج.م · إجمالي العميل: ${currencyFormatter.format(offer.total_amount)} ج.م · الوصول خلال ${offer.arrival_minutes} دقيقة`
+        ));
+        if (offer.note) conversation.append(textElement("p", "offer-note", offer.note));
+        if (offer.status === "accepted") conversation.append(textElement("span", "record-status", "وافق العميل على هذا العرض."));
+      }
+      const messages = document.createElement("div");
+      messages.className = "inquiry-messages";
+      (inquiry.messages || []).forEach((message) => {
+        messages.append(textElement(
+          "p",
+          message.sender_role === "professional" ? "inquiry-message is-customer" : "inquiry-message",
+          `${message.sender_role === "professional" ? "أنت" : "العميل"}: ${message.message}`
+        ));
+      });
+      conversation.append(messages);
+
+      if (match.status === "matched" || match.status === "accepted") {
+        const messageForm = document.createElement("form");
+        messageForm.className = "inquiry-message-form";
+        const messageInput = document.createElement("input");
+        messageInput.name = "message";
+        messageInput.required = true;
+        messageInput.maxLength = 1500;
+        messageInput.placeholder = "اكتب ردك بدون أرقام هاتف أو روابط";
+        const sendButton = document.createElement("button");
+        sendButton.type = "submit";
+        sendButton.className = "button button-light button-small";
+        sendButton.textContent = "إرسال";
+        messageForm.append(messageInput, sendButton);
+        messageForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const { error: sendError } = await supabaseClient.rpc("send_professional_inquiry_message", {
+            p_match_id: match.id,
+            p_message: messageInput.value.trim()
+          });
+          if (sendError) {
+            console.error("Could not send professional inquiry message.", sendError);
+            showToast(sendError.message || "أزل أرقام الهاتف والروابط من الرسالة ثم حاول مرة أخرى.");
+            return;
+          }
+          await loadMatches();
+        });
+        conversation.append(messageForm);
+      }
+
+      if (match.status === "matched" && inquiry.status === "قيد المراجعة") {
+        const offerForm = document.createElement("form");
+        offerForm.className = "professional-offer-form";
+        const priceInput = document.createElement("input");
+        priceInput.type = "number";
+        priceInput.name = "service_base_amount";
+        priceInput.min = "0.01";
+        priceInput.step = "0.01";
+        priceInput.required = true;
+        priceInput.placeholder = "السعر الأساسي بالجنيه";
+        const etaInput = document.createElement("input");
+        etaInput.type = "number";
+        etaInput.name = "arrival_minutes";
+        etaInput.min = "1";
+        etaInput.max = "1440";
+        etaInput.required = true;
+        etaInput.placeholder = "وقت الوصول بالدقائق";
+        const noteInput = document.createElement("input");
+        noteInput.name = "note";
+        noteInput.maxLength = 1500;
+        noteInput.placeholder = "تفاصيل العرض (اختياري، بدون روابط أو أرقام)";
+        if (inquiry.offer?.status === "pending") {
+          priceInput.value = String(inquiry.offer.service_base_amount);
+          etaInput.value = String(inquiry.offer.arrival_minutes);
+          noteInput.value = inquiry.offer.note || "";
+        }
+        const offerButton = document.createElement("button");
+        offerButton.type = "submit";
+        offerButton.className = "button button-primary button-small";
+        offerButton.textContent = inquiry.offer?.status === "pending" ? "تحديث عرض السعر" : "إرسال عرض السعر";
+        offerForm.append(priceInput, etaInput, noteInput, offerButton);
+        offerForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const values = new FormData(offerForm);
+          const { error: offerError } = await supabaseClient.rpc("submit_service_price_offer", {
+            p_match_id: match.id,
+            p_service_base_amount: Number(values.get("service_base_amount")),
+            p_arrival_minutes: Number(values.get("arrival_minutes")),
+            p_note: String(values.get("note") || "")
+          });
+          if (offerError) {
+            console.error("Could not submit the professional price offer.", offerError);
+            showToast(offerError.message || "تعذر إرسال عرض السعر.");
+            return;
+          }
+          showToast("تم إرسال عرض السعر ووقت الوصول للعميل.");
+          await loadMatches();
+        });
+        conversation.append(offerForm);
+      }
+      card.append(conversation);
     }
 
     function subscribeToMatches() {
@@ -1069,7 +1489,8 @@
           event: "*",
           schema: "public",
           table: "service_order_matches"
-        }, () => {
+        }, (payload) => {
+          if (payload.eventType === "INSERT") showToast("وصلك طلب خدمة جديد مطابق لمنطقتك وتخصصك.");
           void loadMatches();
         })
         .on("postgres_changes", {
@@ -1104,18 +1525,18 @@
       }
       phoneInput.setCustomValidity("");
       phoneInput.value = phone;
-      let error;
+      let result;
       try {
-        ({ error } = await signInWithoutSms({
+        result = await signInWithPhone({
           phone,
           password: passwordInput.value
-        }));
+        });
       } catch (signInError) {
-        error = signInError;
+        result = { error: signInError };
       }
-      if (error) {
-        console.error("Could not sign in the artisan.", error);
-        showToast(describeAuthError(error, "تعذر تسجيل الدخول. تأكد من رقم الموبايل وكلمة المرور."));
+      if (result.error) {
+        console.error("Could not sign in the artisan.", result.error);
+        showToast(describePhoneLoginError(result.error, "تعذر تسجيل الدخول. تأكد من رقم الموبايل وكلمة المرور."));
         return;
       }
       const { data: claimed, error: claimError } = await supabaseClient.rpc("claim_professional_account");
@@ -1133,17 +1554,50 @@
       byId("artisan-login").hidden = true;
       byId("artisan-phone").closest("label").hidden = true;
       byId("artisan-password").closest("label").hidden = true;
+      byId("artisan-forgot-password").hidden = true;
       byId("artisan-signout").hidden = false;
+      const { data: presenceUpdated, error: presenceError } = await supabaseClient.rpc("set_professional_presence", { p_online: true });
+      if (presenceError || !presenceUpdated) {
+        console.error("Could not publish professional online status.", presenceError);
+        showToast("تعذر تفعيل حالة التوفر. تحقق من تحديث قاعدة البيانات.");
+      } else if (!presenceChannel) {
+        presenceChannel = window.setInterval(() => {
+          void supabaseClient.rpc("set_professional_presence", { p_online: true }).then(({ error }) => {
+            if (error) console.error("Could not refresh professional online status.", error);
+          });
+        }, 30000);
+      }
       subscribeToMatches();
       await loadMatches();
+    });
+    byId("artisan-forgot-password").addEventListener("click", () => {
+      document.querySelector('[data-auth="login"]').click();
+      byId("auth-reset-toggle").click();
     });
     byId("artisan-phone").addEventListener("input", (event) => {
       event.currentTarget.setCustomValidity("");
     });
     byId("artisan-signout").addEventListener("click", async () => {
+      if (presenceChannel) {
+        window.clearInterval(presenceChannel);
+        presenceChannel = null;
+      }
+      const { data: presenceCleared, error: presenceError } = await supabaseClient.rpc("set_professional_presence", { p_online: false });
+      if (presenceError || !presenceCleared) console.error("Could not clear professional online status.", presenceError);
       const { error } = await supabaseClient.auth.signOut();
       if (error) {
         console.error("Could not sign out the artisan.", error);
+        if (!presenceError) {
+          const { error: restorePresenceError } = await supabaseClient.rpc("set_professional_presence", { p_online: true });
+          if (restorePresenceError) console.error("Could not restore professional online status.", restorePresenceError);
+          else {
+            presenceChannel = window.setInterval(() => {
+              void supabaseClient.rpc("set_professional_presence", { p_online: true }).then(({ error: refreshError }) => {
+                if (refreshError) console.error("Could not refresh professional online status.", refreshError);
+              });
+            }, 30000);
+          }
+        }
         showToast("تعذر تسجيل الخروج.");
         return;
       }
@@ -1152,29 +1606,21 @@
         if (status === "error") console.error("Could not stop artisan order notifications.");
         matchesChannel = null;
       }
+      const inquiryChannelStatuses = await Promise.all(
+        [...inquiryChannels.values()].map((channel) => supabaseClient.removeChannel(channel))
+      );
+      if (inquiryChannelStatuses.some((status) => status === "error")) {
+        console.error("Could not stop all artisan inquiry notifications.");
+      }
+      inquiryChannels.clear();
       byId("artisan-orders").hidden = true;
       byId("artisan-login").hidden = false;
       byId("artisan-phone").closest("label").hidden = false;
       byId("artisan-password").closest("label").hidden = false;
+      byId("artisan-forgot-password").hidden = false;
       byId("artisan-signout").hidden = true;
-    });
-    byId("artisan-accept-form").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!event.currentTarget.reportValidity()) return;
-      const arrivalMinutes = Number(new FormData(event.currentTarget).get("arrival_minutes"));
-      const { error } = await supabaseClient.rpc("accept_service_order", {
-        match_id: acceptedMatchId,
-        arrival_minutes: arrivalMinutes
-      });
-      if (error) {
-        console.error("Could not accept the matching service order.", error);
-        showToast(error.message || "تعذر قبول الطلب.");
-        return;
-      }
-      dialog.close();
-      event.currentTarget.reset();
-      showToast("تم قبول الطلب وإرسال وقت الوصول للعميل.");
-      await loadMatches();
+      byId("artisan-login").textContent = "دخول";
+      byId("artisan-phone").readOnly = false;
     });
   }
 
@@ -1352,7 +1798,7 @@
       const serviceLabel = Array.isArray(record.service) ? record.service.join("، ") : record.service;
       const heading = textElement("strong", "", `${record.name || "بدون اسم"} — ${record.trade || serviceLabel || record.type || "رسالة"}`);
       const detail = kind === "order"
-        ? `${record.governorate}، ${record.area} — ${record.address} | ${record.phone} | ${record.details || "بدون وصف إضافي"}${record.matchedWorkers?.length ? ` | حرفي متاح: ${record.matchedWorkers.map((worker) => worker.name).join("، ")}` : ""}`
+        ? `${record.governorate}، ${record.area} — ${record.address} | ${record.phone}${record.proposedPrice != null ? ` | السعر المقترح: ${currencyFormatter.format(Number(record.proposedPrice))} ج.م` : ""}${record.details ? ` | ${record.details}` : ""}${record.matchedWorkers?.length ? ` | حرفي متاح: ${record.matchedWorkers.map((worker) => worker.name).join("، ")}` : ""}`
         : kind === "worker"
           ? `${record.governorate}، ${record.area} | ${record.phone} | الخبرة: ${record.experience}`
           : `${record.comment || record.message || ""}${record.rating ? ` | التقييم: ${"★".repeat(Number(record.rating))}` : ""}`;
@@ -1390,12 +1836,12 @@
         && normalizeLocation(worker.governorate) === targetGovernorate
         && normalizeLocation(worker.area) === targetArea
       )
-      .map(({ id, name, phone, trade: workerTrade }) => ({ id, name, phone, trade: workerTrade }));
+      .map(({ id, name, trade: workerTrade }) => ({ id, name, trade: workerTrade }));
   }
 
   async function findRemoteAvailableWorkers(trade, governorate, area) {
     const { data, error } = await supabaseClient.from("available_professionals")
-      .select("id, name, phone, trade, governorate, area")
+      .select("id, name, trade, governorate, area")
       .eq("trade", trade)
       .eq("governorate", governorate)
       .eq("area", area);
@@ -1403,7 +1849,7 @@
       console.error("Could not find approved professionals in Supabase.", error);
       return null;
     }
-    return (data || []).map(({ id, name, phone, trade: workerTrade }) => ({ id, name, phone, trade: workerTrade }));
+    return (data || []).map(({ id, name, trade: workerTrade }) => ({ id, name, trade: workerTrade }));
   }
 
   function showAvailabilityResult(workers, order) {
@@ -1413,13 +1859,17 @@
     const list = byId("availability-workers");
     list.replaceChildren();
 
-    heading.textContent = localized(workers.length ? "في حرفي متاح قريب منك" : "تم إرسال طلبك لصاحب الموقع");
-    description.textContent = localized(workers.length
-      ? "لقينا حرفي معتمد في نفس منطقتك، تقدر تتواصل معاه مباشرة."
-      : "لسه مفيش حرفي معتمد قريب منك. طلبك وصل لصاحب الموقع وهيتابع معاك.");
-    byId("request-live-status").textContent = order.id
-      ? `رقم الطلب: ${order.id} — سيتم تحديث الحالة ووقت الوصول هنا تلقائيًا.`
-      : "سيتم تحديث حالة الطلب عند توفر فني مناسب.";
+    heading.textContent = localized(order.existingOrder
+      ? "تفاصيل الطلب والمحادثة"
+      : workers.length
+        ? "في حرفي متصل قريب منك"
+        : "تم إرسال طلبك للحرفيين المطابقين");
+    description.textContent = localized(order.existingOrder
+      ? "تابع حالة طلبك وتحدث مباشرةً مع الحرفيين المهتمين."
+      : workers.length
+      ? "لقينا حرفيين معتمدين ومتصلين في منطقتك. ستظهر عروض الأسعار ووقت الوصول هنا، وتظهر بيانات التواصل بعد تأكيد الحجز."
+      : "تم تسجيل طلبك وسيظهر للحرفيين المعتمدين في منطقتك عند اتصالهم.");
+    byId("request-live-status").textContent = "سيتم تحديث عروض الأسعار والمحادثة ووقت الوصول تلقائيًا.";
     if (order.trackingToken) void subscribeToOrderTracking(order.trackingToken);
     if (order.trackingToken) {
       writeStore(storageKeys.trackingToken, order.trackingToken);
@@ -1433,29 +1883,9 @@
       const info = document.createElement("div");
       info.append(
         textElement("strong", "", worker.name),
-        textElement("span", "", `${localized(worker.trade)} — ${worker.phone}`)
+        textElement("span", "", localized(worker.trade))
       );
-      const actions = document.createElement("div");
-      actions.className = "availability-actions";
-      const phone = String(worker.phone || "").replace(/[^\d+]/g, "");
-      if (phone) {
-        const call = document.createElement("a");
-        call.className = "button button-light button-small";
-        call.href = `tel:${phone}`;
-        call.textContent = localized("اتصال");
-        actions.append(call);
-        const digits = phone.replace(/\D/g, "");
-        const whatsappNumber = digits.startsWith("0") ? `20${digits.slice(1)}` : digits;
-        const message = `مرحبا ${worker.name}، أحتاج ${Array.isArray(order.service) ? order.service.join("، ") : order.service} في ${order.area}، ${order.governorate}.`;
-        const whatsapp = document.createElement("a");
-        whatsapp.className = "button button-primary button-small";
-        whatsapp.href = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-        whatsapp.target = "_blank";
-        whatsapp.rel = "noopener noreferrer";
-        whatsapp.textContent = localized("واتساب");
-        actions.append(whatsapp);
-      }
-      card.append(info, actions);
+      card.append(info, textElement("span", "record-status", localized("بيانات التواصل تظهر بعد تأكيد الحجز.")));
       list.append(card);
     });
 
@@ -1533,7 +1963,9 @@
     const support = supportPhone;
     byId("support-number-label").textContent = support;
     byId("footer-support-number").textContent = support;
-    byId("support-call").href = `tel:${support.replace(/[^\d+]/g, "")}`;
+    byId("support-call").href = `https://wa.me/${support.replace(/\D/g, "").replace(/^0/, "20")}`;
+    byId("support-call").target = "_blank";
+    byId("support-call").rel = "noopener noreferrer";
     byId("support-settings").elements.phone.value = support;
   }
 
@@ -1560,9 +1992,7 @@
     byId("cash-payment-fields").hidden = method !== "cash";
     byId("cash-location-details").required = method === "cash";
     if (method === "instapay" || method === "vodafone_cash") {
-      const methodName = method === "instapay" ? "InstaPay" : "Vodafone Cash";
-      const account = paymentAccounts[method] || paymentPhone;
-      byId("payment-recipient").textContent = `${methodName}: ${account}`;
+      byId("payment-recipient").textContent = localized("سيظهر رقم التحويل بعد تأكيد الحجز.");
       byId("deposit-note").textContent = "يظهر مبلغ العربون 50% بعد اعتماد السعر، ويمكنك دفعه من نافذة متابعة الطلب.";
     } else if (method === "cash") {
       byId("payment-recipient").textContent = "الدفع النقدي يحتاج مراجعة استلام العربون من الإدارة.";
@@ -1573,8 +2003,103 @@
     }
   }
 
+  function paymentRecipient(method, order) {
+    if (order?.payout_method === method && order.payout_account) return order.payout_account;
+    return paymentAccounts[method] || paymentPhone;
+  }
+
+  let refreshOnlineProfessionalsView = () => {};
+
+  function setupOnlineProfessionals() {
+    const section = document.createElement("section");
+    section.className = "section-wrap online-professionals";
+    section.innerHTML = '<div class="section-heading"><div><div class="eyebrow">الحرفيون المتاحون</div><h2>حرفيون جاهزون <span>في منطقتك.</span></h2></div><label class="online-professional-filter">المحافظة / المنطقة<select id="online-professional-area"><option value="">كل المناطق</option></select></label></div><div class="online-professional-list" id="online-professional-list"></div><p class="online-professional-empty" id="online-professional-empty">لا يوجد حرفيون متصلون حاليًا.</p>';
+    const home = byId("page-home");
+    home.querySelector(".review-section").before(section);
+    const areaFilter = byId("online-professional-area");
+    const emptyMessage = byId("online-professional-empty");
+    let availableProfessionals = [];
+
+    const renderAvailableProfessionals = () => {
+      const selectedArea = areaFilter.value;
+      const areaOptions = [...new Map(availableProfessionals.map((professional) => {
+        const key = JSON.stringify([professional.governorate || "", professional.area || ""]);
+        const label = [professional.governorate, professional.area].filter(Boolean).map(localized).join("، ");
+        return [key, { key, label }];
+      })).values()].sort((first, second) => first.label.localeCompare(second.label, "ar"));
+      areaFilter.replaceChildren(new Option(localized("كل المناطق"), ""));
+      areaOptions.forEach(({ key, label }) => areaFilter.add(new Option(label, key)));
+      if (areaOptions.some(({ key }) => key === selectedArea)) areaFilter.value = selectedArea;
+
+      const filtered = areaFilter.value
+        ? availableProfessionals.filter((professional) =>
+          JSON.stringify([professional.governorate || "", professional.area || ""]) === areaFilter.value
+        )
+        : availableProfessionals;
+      const host = byId("online-professional-list");
+      host.replaceChildren();
+      emptyMessage.hidden = filtered.length > 0;
+      emptyMessage.textContent = availableProfessionals.length && areaFilter.value
+        ? localized("لا يوجد حرفيون متاحون في المنطقة المختارة.")
+        : localized("لا يوجد حرفيون متصلون حاليًا.");
+      filtered.forEach((professional) => {
+        const card = document.createElement("article");
+        card.className = "online-professional-card";
+        const title = document.createElement("strong");
+        title.textContent = professional.name;
+        const status = document.createElement("span");
+        status.className = "online-status";
+        status.textContent = localized("متصل ومتاح");
+        const details = document.createElement("small");
+        details.textContent = `${localized(professional.trade)} · ${[professional.governorate, professional.area].filter(Boolean).map(localized).join("، ")}`;
+        card.append(title, status, details);
+        host.append(card);
+      });
+    };
+    areaFilter.addEventListener("change", renderAvailableProfessionals);
+    refreshOnlineProfessionalsView = renderAvailableProfessionals;
+
+    if (!supabaseConfigured) {
+      renderAvailableProfessionals();
+      return;
+    }
+
+    const renderOnlineProfessionals = async () => {
+      const { data, error } = await supabaseClient.from("available_professionals")
+        .select("id, name, trade, governorate, area")
+        .order("name");
+      if (error) {
+        console.error("Could not load online professionals.", error);
+        emptyMessage.textContent = "تعذر تحميل الحرفيين المتصلين.";
+        emptyMessage.hidden = false;
+        return;
+      }
+      availableProfessionals = data || [];
+      renderAvailableProfessionals();
+    };
+    const onlineChannel = supabaseClient.channel("approved-professionals-online")
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "professionals"
+      }, () => void renderOnlineProfessionals())
+      .subscribe((status) => {
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error("Online professional status updates could not be subscribed to.", status);
+          showToast("تعذر تفعيل تحديث حالة الحرفيين المتصلين.");
+        }
+      });
+    window.setInterval(() => void renderOnlineProfessionals(), 30000);
+    document.addEventListener("pagehide", () => {
+      if (onlineChannel) void supabaseClient.removeChannel(onlineChannel);
+    }, { once: true });
+    void renderOnlineProfessionals();
+  }
+
   let paymentAccounts = { instapay: paymentPhone, vodafone_cash: paymentPhone };
   let activeTrackingChannel = null;
+  let activeInquiryChannel = null;
+  let activeInquiryOrderId = "";
   let currentTrackingToken = "";
   let currentTrackingOrder = null;
 
@@ -1607,6 +2132,9 @@
       config: { private: false }
     }).on("broadcast", { event: "order_updated" }, ({ payload }) => {
       if (payload?.status) renderTrackingUpdate(payload);
+      if (payload?.payment_status === "deposit_confirmed") {
+        showToast(localized("تم تأكيد عربونك بنجاح"));
+      }
       void refreshCustomerOrderTracking(trackingToken);
     }).subscribe((status) => {
       if (status === "SUBSCRIBED" && !isSubscribed) {
@@ -1626,10 +2154,216 @@
     });
   }
 
+  async function subscribeToServiceInquiry(orderId, trackingToken) {
+    if (!orderId || !trackingToken || activeInquiryOrderId === orderId) return;
+    if (activeInquiryChannel) {
+      const status = await supabaseClient.removeChannel(activeInquiryChannel);
+      if (status === "error") console.error("Could not close the previous inquiry channel.");
+    }
+    activeInquiryOrderId = orderId;
+    activeInquiryChannel = supabaseClient.channel(`service-inquiry:${orderId}`, {
+      config: { private: false }
+    }).on("broadcast", { event: "inquiry_updated" }, ({ payload }) => {
+      if (payload?.order_id === orderId) void refreshCustomerInquiry(trackingToken);
+    }).subscribe((status) => {
+      if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+        console.error("The real-time inquiry channel failed.", status);
+        showToast("تعذر تفعيل تحديث المحادثة الفوري.");
+      }
+    });
+  }
+
+  async function refreshCustomerInquiry(trackingToken) {
+    if (!supabaseConfigured || !trackingToken) return;
+    const { data, error } = await supabaseClient.rpc("get_service_inquiry", {
+      p_tracking_token: trackingToken
+    });
+    if (error) {
+      console.error("Could not load service inquiry messages and offers.", error);
+      byId("customer-inquiry").hidden = false;
+      byId("customer-inquiry").textContent = "تعذر تحميل المحادثة والعروض. حاول تحديث متابعة الطلب.";
+      return;
+    }
+    if (!data) return;
+    await subscribeToServiceInquiry(data.order_id, trackingToken);
+    renderCustomerInquiry(data, trackingToken);
+  }
+
+  async function loadCustomerOrders() {
+    const host = byId("customer-orders-list");
+    host.replaceChildren();
+    if (!supabaseConfigured || !supabaseClient) {
+      host.append(textElement("p", "customer-orders-empty", localized("تحتاج قائمة طلباتك إلى تسجيل الدخول وإعداد Supabase.")));
+      return;
+    }
+    const { data: result, error } = await supabaseClient.rpc("get_customer_orders");
+    if (error) {
+      console.error("Could not load the signed-in customer's service orders.", error);
+      host.append(textElement("p", "customer-orders-empty", error.message || localized("تعذر تحميل طلباتك. تأكد من تحديث قاعدة البيانات.")));
+      return;
+    }
+    const orders = Array.isArray(result) ? result : [];
+    if (!orders.length) {
+      const empty = document.createElement("div");
+      empty.className = "customer-orders-empty";
+      const requestButton = document.createElement("button");
+      requestButton.type = "button";
+      requestButton.className = "button button-primary";
+      requestButton.textContent = localized("اطلب خدمة");
+      requestButton.addEventListener("click", () => navigate("request"));
+      empty.append(      textElement("p", "", localized("لا توجد طلبات مرتبطة بهذا الحساب حتى الآن.")), requestButton);
+      host.append(empty);
+      return;
+    }
+    orders.forEach((order) => {
+      const card = document.createElement("article");
+      card.className = "customer-order-card";
+      const services = Array.isArray(order.services) ? order.services.join("، ") : "";
+      const details = [order.governorate, order.area].filter(Boolean).join("، ");
+      const title = textElement("strong", "", `${order.trade || "طلب خدمة"}${services ? ` — ${services}` : ""}`);
+      const description = textElement("p", "", `${details}${order.address ? ` · ${order.address}` : ""}${order.created_at ? ` · ${new Date(order.created_at).toLocaleDateString("ar-EG")}` : ""}`);
+      card.append(title, description, textElement("span", "record-status", localized(order.status || "قيد المراجعة")));
+      if (order.total_amount != null) {
+        card.append(textElement(
+          "p",
+          "customer-order-total",
+          `${localized("إجمالي العميل:")} ${currencyFormatter.format(Number(order.total_amount))} ج.م`
+        ));
+      }
+      const openChat = document.createElement("button");
+      openChat.type = "button";
+      openChat.className = "button button-primary button-small";
+      openChat.textContent = localized("افتح المحادثة المباشرة");
+      openChat.disabled = !order.tracking_token;
+      openChat.addEventListener("click", () => {
+        showAvailabilityResult([], {
+          trackingToken: order.tracking_token,
+          existingOrder: true
+        });
+      });
+      card.append(openChat);
+      host.append(card);
+    });
+  }
+
+  async function openCustomerOrders() {
+    if (!supabaseConfigured || !supabaseClient) {
+      showToast(localized("قائمة طلبات الحساب تحتاج إعداد Supabase."));
+      return;
+    }
+    const { data, error } = await supabaseClient.auth.getSession();
+    if (error) {
+      console.error("Could not check the customer session before opening orders.", error);
+      showToast(localized("تعذر التحقق من الحساب. حاول تسجيل الدخول مرة أخرى."));
+      return;
+    }
+    if (!data.session) {
+      pendingOrdersOpen = true;
+      document.querySelector('[data-auth="login"]').click();
+      return;
+    }
+    navigate("orders");
+    await loadCustomerOrders();
+  }
+
+  function renderCustomerInquiry(inquiry, trackingToken) {
+    const host = byId("customer-inquiry");
+    host.replaceChildren();
+    host.hidden = false;
+    host.append(textElement("h4", "", "استفسار الطلب والعروض"));
+    if (!inquiry.matches?.length) {
+      host.append(textElement("p", "inquiry-empty", "سيظهر الحرفيون المطابقون لمنطقتك هنا."));
+      return;
+    }
+    inquiry.matches.forEach((match) => {
+      const card = document.createElement("article");
+      card.className = "inquiry-card";
+      card.append(textElement("strong", "", match.professional_name));
+      const offer = match.offer;
+      if (offer) {
+        const total = Number(offer.total_amount);
+        const base = Number(offer.service_base_amount);
+        const fee = Number(offer.customer_service_fee);
+        card.append(
+          textElement("p", "offer-breakdown", `سعر الخدمة: ${currencyFormatter.format(base)} ج.م + رسوم المنصة 10% (${currencyFormatter.format(fee)} ج.م) = الإجمالي: ${currencyFormatter.format(total)} ج.م`),
+          textElement("p", "offer-eta", `الوصول المتوقع خلال ${offer.arrival_minutes} دقيقة`)
+        );
+        if (offer.note) card.append(textElement("p", "offer-note", offer.note));
+        if (offer.status === "pending" && match.match_status === "matched" && inquiry.status === "قيد المراجعة") {
+          const accept = document.createElement("button");
+          accept.type = "button";
+          accept.className = "button button-primary";
+          accept.textContent = "موافقة على العرض وتأكيد الحجز";
+          accept.addEventListener("click", async () => {
+            const { error } = await supabaseClient.rpc("accept_service_price_offer", {
+              p_tracking_token: trackingToken,
+              p_offer_id: offer.id
+            });
+            if (error) {
+              console.error("Could not accept the service price offer.", error);
+              showToast(error.message || "تعذر تأكيد العرض.");
+              return;
+            }
+            showToast("تم قبول العرض وتأكيد الحجز.");
+            await refreshCustomerOrderTracking(trackingToken);
+          });
+          card.append(accept);
+        } else if (offer.status === "accepted") {
+          card.append(textElement("span", "record-status", "تم قبول العرض وتأكيد الحجز."));
+        }
+      } else {
+        card.append(textElement("p", "inquiry-empty", "لم يصل عرض سعر بعد."));
+      }
+
+      const messages = document.createElement("div");
+      messages.className = "inquiry-messages";
+      (match.messages || []).forEach((message) => {
+        messages.append(textElement(
+          "p",
+          message.sender_role === "customer" ? "inquiry-message is-customer" : "inquiry-message",
+          `${message.sender_role === "customer" ? "أنت" : match.professional_name}: ${message.message}`
+        ));
+      });
+      card.append(messages);
+      if (match.match_status === "matched" || match.match_status === "accepted") {
+        const form = document.createElement("form");
+        form.className = "inquiry-message-form";
+        const input = document.createElement("input");
+        input.name = "message";
+        input.required = true;
+        input.maxLength = 1500;
+        input.placeholder = "اكتب استفسارك بدون أرقام هاتف أو روابط";
+        const button = document.createElement("button");
+        button.type = "submit";
+        button.className = "button button-light button-small";
+        button.textContent = "إرسال";
+        form.append(input, button);
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const { error } = await supabaseClient.rpc("send_customer_inquiry_message", {
+            p_tracking_token: trackingToken,
+            p_match_id: match.match_id,
+            p_message: input.value.trim()
+          });
+          if (error) {
+            console.error("Could not send customer inquiry message.", error);
+            showToast(error.message || "أزل أرقام الهاتف والروابط من الرسالة ثم حاول مرة أخرى.");
+            return;
+          }
+          await refreshCustomerInquiry(trackingToken);
+        });
+        card.append(form);
+      }
+      host.append(card);
+    });
+  }
+
   function renderTrackingUpdate(payload) {
     const eta = payload?.estimated_arrival_minutes;
     const status = payload?.status || "قيد المراجعة";
-    byId("request-live-status").textContent = document.documentElement.lang === "en"
+    byId("request-live-status").textContent = payload?.payment_status === "deposit_confirmed"
+      ? localized("تم تأكيد عربونك بنجاح")
+      : document.documentElement.lang === "en"
       ? eta
         ? `Order accepted — estimated arrival in ${eta} minutes.`
         : `Order status: ${localized(status)}`
@@ -1644,6 +2378,7 @@
       currentTrackingOrder = fallbackOrder;
       byId("customer-tracking-status").textContent = fallbackOrder?.status || "تم حفظ الطلب محليًا؛ التحديثات الفورية تحتاج إعداد Supabase.";
       byId("customer-tracking-amounts").textContent = "يتم تحديد السعر ونصفه كعربون ونصفه المتبقي بعد مراجعة الطلب.";
+      byId("customer-inquiry").hidden = true;
       byId("final-payment-form").hidden = true;
       return;
     }
@@ -1662,19 +2397,35 @@
     }
     currentTrackingOrder = data;
     renderTrackingUpdate(data);
-    byId("customer-tracking-status").textContent = data.status;
+    byId("customer-tracking-status").textContent = data.payment_status === "deposit_confirmed"
+      ? localized("تم تأكيد عربونك بنجاح")
+      : data.status;
+    void refreshCustomerInquiry(trackingToken);
+    const professionalContact = byId("customer-professional-contact");
+    professionalContact.replaceChildren();
+    if (data.professional_phone && data.status !== "قيد المراجعة") {
+      const phone = String(data.professional_phone).replace(/[^\d+]/g, "");
+      const call = document.createElement("a");
+      call.href = `tel:${phone}`;
+      call.textContent = `${localized("رقم الحرفي بعد تأكيد الحجز")}: ${data.professional_phone}`;
+      professionalContact.append(call);
+      professionalContact.hidden = !phone;
+    } else {
+      professionalContact.hidden = true;
+    }
     byId("customer-tracking-amounts").textContent = data.total_amount == null
-      ? "بانتظار اعتماد السعر؛ العربون 50% والباقي 50% بعد إتمام الخدمة."
-      : `إجمالي السعر: ${currencyFormatter.format(data.total_amount)} ج.م · العربون 50%: ${currencyFormatter.format(data.deposit_amount)} ج.م · المتبقي: ${currencyFormatter.format(data.remaining_amount)} ج.م`;
+      ? "بانتظار عروض الأسعار. سيظهر السعر الأساسي ورسوم المنصة 10% والإجمالي قبل تأكيد الحجز."
+      : `سعر الخدمة: ${currencyFormatter.format(data.service_base_amount)} ج.م + رسوم المنصة 10% (${currencyFormatter.format(data.customer_service_fee)} ج.م) = الإجمالي: ${currencyFormatter.format(data.total_amount)} ج.م · العربون 50%: ${currencyFormatter.format(data.deposit_amount)} ج.م · المتبقي: ${currencyFormatter.format(data.remaining_amount)} ج.م`;
     const depositForm = byId("deposit-payment-form");
-    const canSubmitDeposit = data.total_amount != null
+    const canSubmitDeposit = Boolean(data.professional_phone)
+      && data.total_amount != null
       && data.deposit_status === "غير مدفوع"
       && ["instapay", "vodafone_cash"].includes(data.payment_method);
     depositForm.hidden = !canSubmitDeposit;
     if (canSubmitDeposit) {
       const methodName = data.payment_method === "instapay" ? "InstaPay" : "Vodafone Cash";
       depositForm.querySelector(".payment-recipient").textContent =
-        `حوّل العربون (${currencyFormatter.format(data.deposit_amount)} ج.م) عبر ${methodName}: ${paymentAccounts[data.payment_method] || paymentPhone}`;
+        `حوّل العربون (${currencyFormatter.format(data.deposit_amount)} ج.م) عبر ${methodName}: ${paymentRecipient(data.payment_method, data)}`;
     } else if (data.deposit_status === "بانتظار المراجعة") {
       byId("customer-tracking-status").textContent = "تم استلام بيانات العربون، وهو بانتظار مراجعة الإدارة.";
     }
@@ -1687,7 +2438,7 @@
       const recipient = byId("final-payment-form").querySelector(".payment-recipient");
       recipient.textContent = method === "cash"
         ? "سجّل دفع المبلغ المتبقي نقدًا، ثم أكّد الاستلام."
-        : `المتبقي عبر ${method === "instapay" ? "InstaPay" : "Vodafone Cash"}: ${paymentAccounts[method] || paymentPhone}`;
+        : `المتبقي عبر ${method === "instapay" ? "InstaPay" : "Vodafone Cash"}: ${paymentRecipient(method, data)}`;
       updateFinalPaymentRequirement();
     } else {
       byId("final-payment-form").reset();
@@ -1716,9 +2467,7 @@
       showToast(error.message || "تعذر إرسال إثبات العربون.");
       return;
     }
-    showToast(receiptPath
-      ? "تم استلام إيصال العربون وتحديث حالة الطلب."
-      : "تم إرسال رقم المعاملة، وهو بانتظار مراجعة الإدارة.");
+    showToast("تم استلام إثبات العربون، وهو بانتظار مراجعة الإدارة.");
     await refreshCustomerOrderTracking(currentTrackingToken);
   }
 
@@ -1807,7 +2556,7 @@
     return paths;
   }
 
-  document.addEventListener("click", (event) => {
+  document.addEventListener("click", async (event) => {
     const target = event.target;
     if (!(target instanceof Element)) return;
     const closeDialog = target.closest("[data-dialog-close]");
@@ -1818,6 +2567,10 @@
     const pageLink = target.closest("[data-page-link]");
     if (pageLink) {
       event.preventDefault();
+      if (pageLink.dataset.pageLink === "orders") {
+        await openCustomerOrders();
+        return;
+      }
       if (pageLink.dataset.pageLink === "account") {
         navigate("home");
         window.setTimeout(() => document.querySelector(".suggestion-section").scrollIntoView({ behavior: "smooth", block: "start" }), 100);
@@ -1917,6 +2670,16 @@
   byId("request-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
+    let submitError = byId("request-submit-error");
+    if (!submitError) {
+      submitError = document.createElement("p");
+      submitError.id = "request-submit-error";
+      submitError.className = "error-message";
+      submitError.setAttribute("role", "alert");
+      form.querySelector(".form-submit").before(submitError);
+    }
+    submitError.hidden = true;
+    submitError.textContent = "";
     if (!form.querySelector('input[name="services"]:checked')) {
       showToast(localized("اختار خدمة واحدة على الأقل."));
       byId("request-service-options").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1934,6 +2697,9 @@
       governorate: data.get("governorate"),
       area,
       address: data.get("address"),
+      locationLatitude: data.get("location_latitude") ? Number(data.get("location_latitude")) : null,
+      locationLongitude: data.get("location_longitude") ? Number(data.get("location_longitude")) : null,
+      proposedPrice: data.get("proposed_price") ? Number(data.get("proposed_price")) : null,
       details: data.get("details"),
       name: data.get("name"),
       phone: data.get("phone"),
@@ -1945,7 +2711,10 @@
       createdAt: new Date().toISOString()
     };
     if (supabaseConfigured) {
-      const { error } = await supabaseClient.from("service_orders").insert({
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+      if (sessionError) console.error("Could not check the session while submitting a customer order.", sessionError);
+      const orderPayload = {
+        customer_user_id: sessionData?.session?.user?.id || null,
         customer_name: order.name,
         phone: order.phone,
         trade: order.trade,
@@ -1953,15 +2722,28 @@
         governorate: order.governorate,
         area: order.area,
         address: order.address,
+        location_latitude: order.locationLatitude,
+        location_longitude: order.locationLongitude,
+        proposed_price: order.proposedPrice,
         details: order.details || "",
         payment_method: order.paymentMethod,
         cash_location_details: order.cashLocationDetails || null,
         area_size_sqm: order.areaSizeSqm,
         tracking_token: order.trackingToken
-      });
+      };
+      const { error } = await supabaseClient.from("service_orders").insert(orderPayload);
       if (error) {
-        console.error("Could not submit the service order to Supabase.", error);
-        showToast("تعذر إرسال الطلب. حاول مرة أخرى أو تواصل مع الدعم.");
+        console.log("Supabase service_orders insert error:", error);
+        const errorMessage = [error.code, error.message, error.details, error.hint].filter(Boolean).join(" — ");
+        const schemaMismatch = error.code === "PGRST204"
+          || error.code === "42703"
+          || /column .* does not exist|could not find the .* column/i.test(error.message || "");
+        const schemaHelp = schemaMismatch
+          ? `${localized("تأكد من تشغيل supabase-setup.sql لتحديث أعمدة الطلب ثم أعد المحاولة.")} `
+          : "";
+        submitError.textContent = `${schemaHelp}${errorMessage || "تعذر إرسال الطلب إلى قاعدة البيانات."}`;
+        submitError.hidden = false;
+        showToast("تعذر إرسال الطلب. راجع تفاصيل الخطأ الظاهرة أسفل النموذج.");
         return;
       }
       order.matchedWorkers = await findRemoteAvailableWorkers(order.trade, order.governorate, order.area);
@@ -1970,6 +2752,8 @@
       orders.unshift(order);
       if (!writeStore(storageKeys.orders, orders)) return;
     }
+    submitError.hidden = true;
+    submitError.textContent = "";
     form.reset();
     renderRequestServices("");
     byId("area-size-sqm").value = "";
@@ -1987,6 +2771,8 @@
     showAvailabilityResult(order.matchedWorkers, order);
   });
 
+  let artisanUserId = null;
+
   byId("join-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -2003,23 +2789,24 @@
     const localPhone = `0${authPhone.slice(3)}`;
     phoneInput.value = localPhone;
     data.set("phone", localPhone);
-    let artisanUserId = null;
     if (supabaseConfigured) {
       try {
-        const registration = await signUpWithoutSms({
-          phone: authPhone,
-          password: String(data.get("account_password") || ""),
-          fullName: String(data.get("name")).trim()
-        });
-        if (registration.error) {
-          console.error("Could not create the artisan login.", registration.error);
-          showToast(describeAuthError(registration.error, "تعذر إنشاء حساب الحرفي."));
-          return;
-        }
-        artisanUserId = registration.data?.user?.id || null;
-        if (!registration.data?.session) {
-          showToast("تعذر تفعيل الحساب. عطّل Confirm email في إعدادات Supabase Authentication ثم أعد المحاولة.");
-          return;
+        if (!artisanUserId) {
+          const registration = await signUpCustomerAccount({
+            phone: authPhone,
+            password: String(data.get("account_password") || ""),
+            fullName: String(data.get("name")).trim()
+          });
+          if (registration.error) {
+            console.error("Could not create the artisan login.", registration.error);
+            showToast(describeAuthError(registration.error, "تعذر إنشاء حساب الحرفي."));
+            return;
+          }
+          artisanUserId = registration.data?.user?.id || null;
+          if (!registration.data?.session) {
+            showToast("تعذر تفعيل الحساب. عطّل Confirm email في إعدادات Supabase Authentication ثم أعد المحاولة.");
+            return;
+          }
         }
       } catch (registrationError) {
         console.error("Could not create the artisan login.", registrationError);
@@ -2051,6 +2838,7 @@
       address: data.get("address"),
       idFile: data.get("id-image").name,
       payoutMethod: data.get("payout_method"),
+      payoutAccount: data.get("payout_account"),
       portfolioFiles: [...data.getAll("portfolio_images")].filter((file) => file.size > 0).map((file) => file.name),
       idImage,
       status: "قيد المراجعة",
@@ -2083,6 +2871,7 @@
         id_image_path: imagePath,
         portfolio_paths: portfolioPaths,
         payout_method: worker.payoutMethod,
+        payout_account: worker.payoutAccount || null,
         user_id: artisanUserId
       });
       if (error) {
@@ -2096,6 +2885,10 @@
       if (!writeStore(storageKeys.workers, workers)) return;
     }
     form.reset();
+    artisanUserId = null;
+    form.querySelector(".form-submit").textContent = "إرسال طلب التسجيل ←";
+    byId("payout-account").closest(".form-label").hidden = true;
+    byId("payout-account").required = false;
     idImagePromise = Promise.resolve("");
     resetDistrictSelect("join-form", "join-area");
     byId("id-preview").hidden = true;
@@ -2167,6 +2960,7 @@
   byId("language-toggle").addEventListener("click", () => {
     document.documentElement.lang = document.documentElement.lang === "ar" ? "en" : "ar";
     localizePage();
+    refreshOnlineProfessionalsView();
   });
   byId("theme-toggle").addEventListener("click", () => {
     document.documentElement.dataset.theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
@@ -2182,7 +2976,11 @@
     const open = nav.classList.toggle("is-open");
     menuToggle.setAttribute("aria-expanded", String(open));
   });
-  window.addEventListener("popstate", () => navigate(pageNames.has(location.hash.slice(1)) ? location.hash.slice(1) : "home", false));
+  window.addEventListener("popstate", () => {
+    const page = pageNames.has(location.hash.slice(1)) ? location.hash.slice(1) : "home";
+    if (page === "orders") void openCustomerOrders();
+    else navigate(page, false);
+  });
 
   document.querySelector("#page-request .form-note p").textContent = supabaseConfigured
     ? "بيانات الطلب تُرسل إلى قاعدة بيانات Supabase."
@@ -2191,8 +2989,67 @@
     ? "تُحفظ بيانات الحرفي وصورة الهوية ومعرض الأعمال في مساحة خاصة لا يراها إلا المدير المخول."
     : "وضع تجريبي محلي: لا ترفع بيانات أو صور هوية حقيقية قبل إعداد Supabase.";
   document.querySelector("#join-form .privacy-copy").textContent = supabaseConfigured
-    ? "بيانات الهوية ومعرض الأعمال مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير."
+    ? "يُنشأ حساب الحرفي ببريد داخلي مرتبط برقم الهاتف دون SMS. بيانات الهوية ومعرض الأعمال مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير."
     : "وضع تجريبي محلي: بيانات وصور الهوية لا تُرفع إلى خادم.";
+
+  function setupSnowfall() {
+    const canvas = byId("snowfall-canvas");
+    const context = canvas?.getContext("2d");
+    if (!canvas || !context || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let width = 0;
+    let height = 0;
+    let flakes = [];
+    let frame = 0;
+
+    function resize() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      flakes = Array.from({ length: Math.min(90, Math.ceil(width / 14)) }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2.2 + 0.6,
+        speed: Math.random() * 0.8 + 0.35,
+        drift: Math.random() * 0.7 + 0.15,
+        phase: Math.random() * Math.PI * 2,
+        opacity: Math.random() * 0.45 + 0.25
+      }));
+    }
+
+    function draw() {
+      context.clearRect(0, 0, width, height);
+      flakes.forEach((flake) => {
+        flake.y += flake.speed;
+        flake.x += Math.sin(flake.phase += 0.012) * flake.drift;
+        if (flake.y > height + flake.radius) {
+          flake.y = -flake.radius;
+          flake.x = Math.random() * width;
+        }
+        context.beginPath();
+        context.fillStyle = `rgba(255, 255, 255, ${flake.opacity})`;
+        context.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+        context.fill();
+      });
+      frame = window.requestAnimationFrame(draw);
+    }
+
+    resize();
+    draw();
+    window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        window.cancelAnimationFrame(frame);
+      } else {
+        window.cancelAnimationFrame(frame);
+        frame = window.requestAnimationFrame(draw);
+      }
+    });
+  }
+
+  setupSnowfall();
   populateSelects();
   setupDistrictSelects();
   setupRequestExperience();
@@ -2204,6 +3061,7 @@
   updatePaymentInstructions();
   renderTradeCards(trades, byId("home-trade-grid"));
   renderTradeCards(trades, byId("directory-grid"));
+  setupOnlineProfessionals();
   renderDashboard();
   const savedTheme = localStorage.getItem("salla7ly-v2-theme");
   if (savedTheme === "dark") {
@@ -2215,5 +3073,6 @@
     localizePage();
   }
   const initialPage = location.hash.slice(1);
-  if (pageNames.has(initialPage)) navigate(initialPage, false);
+  if (initialPage === "orders") void openCustomerOrders();
+  else if (pageNames.has(initialPage)) navigate(initialPage, false);
 })();

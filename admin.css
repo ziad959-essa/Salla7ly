@@ -48,17 +48,31 @@ input:focus, select:focus { outline: 3px solid #205a4326; border-color: #6f9b7d;
 .panel-heading p { margin: 3px 0 0; }
 .filters { display: grid; grid-template-columns: minmax(180px, 1.5fr) repeat(2, minmax(145px, 1fr)) auto; align-items: end; gap: 11px; margin: 18px 0; }
 .record-list { display: grid; gap: 11px; }
-.record { min-width: 0; display: grid; grid-template-columns: minmax(180px, 1.3fr) repeat(3, minmax(120px, .75fr)) auto; align-items: end; gap: 12px; padding: 15px; border: 1px solid var(--line); border-radius: 10px; }
-.record-info { align-self: center; min-width: 0; }
-.record-info strong, .record-info span { display: block; overflow-wrap: anywhere; }
+.record { min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 14px; padding: 16px; border: 1px solid var(--line); border-radius: 10px; }
+.record-info { grid-column: 1 / -1; display: grid; gap: 9px; min-width: 0; }
+.record-info strong, .record-info span { min-width: 0; display: block; overflow-wrap: anywhere; }
 .record-info strong { font-size: 13px; }
-.record-info span { margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.7; }
-.record-controls { display: grid; gap: 5px; }
+.record-info .proposed-price { width: fit-content; max-width: 100%; padding: 7px 10px; border-radius: 7px; background: #edf4e9; color: var(--green); font-size: 12px; font-weight: 700; }
+.record-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); gap: 7px; }
+.record-details > span { padding: 7px 9px; border-radius: 7px; background: #f8faf7; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.order-summary { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 8px; }
+.order-summary-item { min-width: 0; display: grid; align-content: start; gap: 5px; padding: 10px; border: 1px solid var(--line); border-radius: 8px; background: #f8faf7; }
+.order-summary-item > span { color: var(--muted); font-size: 10px; }
+.order-summary-item > strong { overflow-wrap: anywhere; font-size: 11px; line-height: 1.6; }
+.order-summary-item:last-child > strong { color: var(--green); }
+.record > .record-controls { min-width: 0; display: grid; align-content: start; gap: 5px; }
 .record-controls label { font-size: 10px; }
 .record-controls input, .record-controls select { min-height: 36px; font-size: 11px; }
-.record-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.record > .record-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
 .record-actions .button { white-space: nowrap; }
+.record-actions .danger { border: 1px solid #e8caca; background: #fff4f3; color: #a33e36; }
+html[data-theme="dark"] .record-actions .danger { border-color: #70413d; background: #3a2523; color: #ffaaa1; }
+.transaction-record { border-inline-start: 4px solid #d5a74a; }
 .commission-hint { color: #56805b; font-size: 10px; }
+.chat-log { display: grid; gap: 5px; padding: 13px; border: 1px solid var(--line); border-radius: 9px; background: var(--white); }
+.chat-log strong { font-size: 12px; }
+.chat-log span { color: var(--muted); font-size: 10px; }
+.chat-log p { margin: 0; overflow-wrap: anywhere; font-size: 12px; }
 .empty { padding: 20px; color: var(--muted); text-align: center; font-size: 12px; }
 .manual-form { align-items: end; margin-top: 14px; }
 .toast, .error-message { position: fixed; z-index: 99999; right: 50%; bottom: 20px; max-width: calc(100% - 30px); padding: 12px 18px; border-radius: 9px; background: #183c2b; color: #fff; font-size: 12px; opacity: 0; pointer-events: none; transform: translate(50%, 10px); transition: .2s ease; }
@@ -80,16 +94,18 @@ html[data-theme="dark"] input,
 html[data-theme="dark"] select { border-color: #445348; background: #19211b; color: var(--ink); }
 html[data-theme="dark"] .secondary { border-color: var(--line); background: #253129; color: var(--ink); }
 html[data-theme="dark"] .record { border-color: var(--line); background: #1d261f; }
+html[data-theme="dark"] .order-summary-item { border-color: var(--line); background: #19211b; }
+html[data-theme="dark"] .record-info .proposed-price { background: #2a392f; color: #d3e6cf; }
+html[data-theme="dark"] .record-details > span { background: #19211b; }
+html[data-theme="dark"] .chat-log { border-color: var(--line); background: #1d261f; }
 @media (max-width: 900px) {
   .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .record { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .record-info { grid-column: 1 / -1; }
-  .record-actions { grid-column: 1 / -1; }
+  .order-summary { grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); }
 }
 @media (max-width: 600px) {
   .topbar { height: 62px; padding-inline: 16px; }
   .shell { width: calc(100% - 28px); margin: 25px auto 45px; }
-  .auth-card { margin: 7vh auto; padding: 23px; }
+  .auth-card { width: 100%; margin: 24px auto; padding: clamp(18px, 5vw, 23px); }
   .page-head { align-items: flex-start; }
   .page-head .button { flex-shrink: 0; padding-inline: 10px; }
   .metrics { gap: 8px; }
@@ -98,10 +114,21 @@ html[data-theme="dark"] .record { border-color: var(--line); background: #1d261f
   .metric strong { font-size: 18px; }
   .panel { padding: 15px; }
   .filters, .manual-form { grid-template-columns: 1fr; }
-  .record { grid-template-columns: 1fr 1fr; gap: 9px; padding: 12px; }
-  .record-info, .record-actions { grid-column: 1 / -1; }
+  .record { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 12px; }
+  .record-info, .record-actions, .order-summary { grid-column: 1 / -1; }
+  .record-details { grid-template-columns: repeat(auto-fit, minmax(min(100%, 135px), 1fr)); }
+  .order-summary { grid-template-columns: repeat(auto-fit, minmax(min(100%, 130px), 1fr)); }
   .record-actions .button { flex: 1; }
   .back-link { font-size: 11px; }
   .topbar-actions { gap: 9px; }
   .topbar-actions .button { min-height: 36px; padding: 7px 9px; font-size: 10px; }
+}
+@media (max-width: 400px) {
+  .topbar { padding-inline: 10px; }
+  .brand { gap: 6px; font-size: 16px; }
+  .brand-mark { width: 34px; height: 34px; }
+  .topbar-actions { gap: 6px; }
+  .topbar-actions .button { padding-inline: 7px; }
+  .back-link { font-size: 10px; }
+  .auth-card { border-radius: 12px; }
 }
