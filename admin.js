@@ -343,7 +343,7 @@
   function getOrderStatusCategory(status) {
     if (["قيد المراجعة", "بانتظار مراجعة العربون", "بانتظار مراجعة العربون النقدي"].includes(status)) return "pending";
     if (status === "تم التأكيد") return "accepted";
-    if (["تم دفع العربون - قيد التنفيذ", "بانتظار تأكيد العميل"].includes(status)) return "in_progress";
+    if (["تم دفع العربون - قيد التنفيذ", "الحرفي في الطريق", "بانتظار تأكيد العميل"].includes(status)) return "in_progress";
     if (["مكتمل نهائياً", "مكتمل"].includes(status)) return "completed";
     if (status === "ملغي") return "cancelled";
     return "";

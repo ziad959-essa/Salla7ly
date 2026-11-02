@@ -129,6 +129,11 @@
     "منطقة أخرى / غير مدرجة": "Other / not listed", "اكتب اسم المنطقة أو المركز": "Enter district or city",
     "الشارع والعنوان بالتفصيل": "Street and full address", "اسم الشارع، رقم العمارة، الدور، علامة مميزة...": "Street, building, floor, nearby landmark...",
     "استخدم موقعي الحالي": "Use my current location",
+    "نطاق البحث الجغرافي": "Geographic search radius",
+    "من متر واحد إلى 10 كم. حدّد موقعك عبر GPS للبحث بالمسافة؛ من دونه نطابق المحافظة والمنطقة.": "From 1 meter to 10 km. Pin your location to match by distance; otherwise, matching uses governorate and area.",
+    "حدّد موقع العمل عبر GPS (اختياري)": "Pin your work location using GPS (optional)",
+    "موقع العمل محفوظ وسيُستخدم لمطابقة الطلبات القريبة.": "Work location saved and will be used to match nearby requests.",
+    "موقع العمل غير محدد؛ ستعتمد المطابقة على المنطقة.": "Work location is not set; matching will use the selected area.",
     "أدخل العنوان يدويًا أو حدّد موقعك عبر GPS.": "Enter the address or pin your location using GPS.",
     "جارٍ تحديد موقعك...": "Getting your location...",
     "تم تحديد موقعك وإرفاقه بالطلب.": "Your location has been pinned to the request.",
@@ -316,6 +321,7 @@
     "يُنشأ حساب الحرفي ببريد داخلي مرتبط برقم الهاتف دون SMS. بيانات الهوية ومعرض الأعمال مخزنة في مساحة خاصة ومقيدة بصلاحيات المدير.": "The professional account uses an internal email alias linked to the phone number, without SMS. ID and portfolio images are stored privately and accessible only to authorized admins.",
     "التسجيل والدخول برقم الهاتف وكلمة المرور دون SMS؛ استعادة SMS تتطلب مزودًا ورقم هاتف موثقًا في Supabase، والحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.": "Sign-up and login use your phone number and password without SMS. SMS recovery requires a provider and a verified Supabase phone; local alias accounts cannot receive SMS.",
     "نسيت كلمة المرور؟": "Forgot password?",
+    "تواصل مع الدعم لحذف الحساب وإعادة التسجيل": "Contact support to delete your account and register again",
     "إعادة تعيين كلمة المرور": "Reset password",
     "استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.": "SMS recovery is available only for accounts linked to a verified Supabase phone; local alias accounts cannot receive SMS.",
     "رمز التحقق": "Verification code",
@@ -346,6 +352,10 @@
     "مكتمل نهائياً": "Completed",
     "بانتظار تأكيد العميل": "Awaiting customer confirmation",
     "تم دفع العربون - قيد التنفيذ": "Deposit paid - in progress",
+    "الحرفي في الطريق": "The professional is on the way",
+    "الحرفي بدأ التحرك إليك. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب بالفعل؛ لا تدفع رسومًا إضافية.": "The professional is on the way. The 10% platform fee is already included in your order total; do not pay an extra fee.",
+    "بدء التحرك للعميل": "Start traveling to customer",
+    "تم إشعار العميل بأنك في الطريق. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب.": "The customer was notified that you are on the way. The 10% platform fee is included in the order total.",
     "بانتظار اعتماد السعر؛ العربون 50% والباقي 50% بعد إتمام الخدمة.": "Waiting for a price quote; 50% deposit and the remaining 50% after service completion.",
     "لا تُصرف مستحقات الحرفي من المنصة قبل تأكيدك رضاك واستلام الخدمة.": "The professional's platform payout is not released before you confirm satisfaction and receipt.",
     "تنبيه: التحويل إلى InstaPay أو Vodafone Cash في النسخة الحالية يتم مباشرةً إلى رقم الاستقبال، ولا تحتجز المنصة الأموال فعليًا. يلزم ربط بوابة دفع/حساب ضمان لتفعيل الحجز والإفراج الآلي.": "Note: InstaPay and Vodafone Cash transfers currently go directly to the recipient; the platform does not hold funds. A payment gateway/escrow account is required for actual holds and automatic release."
@@ -447,6 +457,7 @@
 
   const pageNames = new Set(["home", "services", "request", "join", "artisan", "orders"]);
   const supportPhone = "01068076603";
+  const supportWhatsApp = "https://wa.me/201068076603";
   const paymentPhone = "01063459472";
   const currencyFormatter = new Intl.NumberFormat("ar-EG", { maximumFractionDigits: 2 });
   const storageKeys = {
@@ -506,6 +517,18 @@
       toast.classList.remove("is-visible");
       if (toast.parentElement !== document.body) document.body.append(toast);
     }, 4200);
+  }
+
+  function createSupportLink(button) {
+    const link = document.createElement("a");
+    link.id = button.id;
+    link.className = button.className;
+    link.href = supportWhatsApp;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = localized("تواصل مع الدعم لحذف الحساب وإعادة التسجيل");
+    button.replaceWith(link);
+    return link;
   }
 
   function navigate(page, updateHistory = true) {
@@ -745,6 +768,34 @@
     const locationStatus = byId("request-location-status");
     const latitudeInput = byId("request-location-latitude");
     const longitudeInput = byId("request-location-longitude");
+    const radiusLabel = document.createElement("label");
+    radiusLabel.className = "form-label distance-radius-label";
+    const radiusTitle = document.createElement("span");
+    radiusTitle.textContent = localized("نطاق البحث الجغرافي");
+    const radiusValue = document.createElement("output");
+    radiusValue.className = "distance-radius-value";
+    const radiusInput = document.createElement("input");
+    radiusInput.type = "range";
+    radiusInput.name = "matching_radius_meters";
+    radiusInput.min = "1";
+    radiusInput.max = "10000";
+    radiusInput.step = "1";
+    radiusInput.setAttribute("value", "10000");
+    radiusInput.value = "10000";
+    const radiusHint = document.createElement("small");
+    radiusHint.className = "distance-radius-hint";
+    radiusHint.textContent = localized("من متر واحد إلى 10 كم. حدّد موقعك عبر GPS للبحث بالمسافة؛ من دونه نطابق المحافظة والمنطقة.");
+    const updateRadiusValue = () => {
+      const meters = Number(radiusInput.value);
+      const english = document.documentElement.lang === "en";
+      radiusValue.textContent = meters >= 1000
+        ? `${Number((meters / 1000).toFixed(2))} ${english ? "km" : "كم"}`
+        : `${meters} ${english ? "m" : "متر"}`;
+    };
+    radiusLabel.append(radiusTitle, radiusValue, radiusInput, radiusHint);
+    locationButton.closest(".request-location-tools").after(radiusLabel);
+    radiusInput.addEventListener("input", updateRadiusValue);
+    updateRadiusValue();
     locationButton.textContent = localized("استخدم موقعي الحالي");
     const resetLocationStatus = () => {
       locationStatus.textContent = localized("أدخل العنوان يدويًا أو حدّد موقعك عبر GPS.");
@@ -771,7 +822,10 @@
         locationButton.disabled = false;
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
     });
-    form.addEventListener("reset", resetLocationStatus);
+    form.addEventListener("reset", () => {
+      resetLocationStatus();
+      setTimeout(updateRadiusValue, 0);
+    });
     byId("payment-method").closest(".form-label").remove();
     byId("payment-instructions").remove();
 
@@ -1013,7 +1067,7 @@
     const authError = byId("auth-error");
     const submit = form.querySelector(".form-submit");
     const resetForm = byId("password-reset-form");
-    const resetToggle = byId("auth-reset-toggle");
+    const resetToggle = createSupportLink(byId("auth-reset-toggle"));
     const resetError = byId("reset-error");
     const resetSubmit = resetForm.querySelector(".form-submit");
     const modeButton = document.createElement("button");
@@ -1023,6 +1077,7 @@
     form.after(modeButton);
     let mode = "signup";
     let resetStep = "request";
+    resetToggle.textContent = localized("تواصل مع الدعم لحذف الحساب وإعادة التسجيل");
 
     function showAuthError(message) {
       if (authError) {
@@ -1136,24 +1191,6 @@
       }
     });
     modeButton.addEventListener("click", () => setMode(mode === "signup" ? "login" : "signup"));
-    resetToggle.addEventListener("click", () => {
-      setMode("login");
-      resetStep = "request";
-      resetForm.reset();
-      resetForm.querySelector('[data-reset-field="otp"]').hidden = true;
-      resetForm.querySelector('[data-reset-field="password"]').hidden = true;
-      resetForm.elements.otp.required = false;
-      resetForm.elements.password.required = false;
-      resetSubmit.textContent = "إرسال رمز التحقق";
-      showResetError("");
-      form.hidden = true;
-      modeButton.hidden = true;
-      resetToggle.hidden = true;
-      resetForm.hidden = false;
-      byId("auth-title").textContent = "إعادة تعيين كلمة المرور";
-      dialog.querySelector(".auth-description").textContent = localized("استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.");
-      resetForm.querySelector(".privacy-copy").textContent = localized("استعادة SMS متاحة فقط للحسابات المرتبطة برقم هاتف موثق في Supabase؛ الحسابات المنشأة ببريد داخلي محلي لا تستقبل SMS.");
-    });
     byId("auth-reset-back").addEventListener("click", () => setMode("login"));
     resetForm.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -1247,6 +1284,7 @@
     section.dataset.page = "artisan";
     section.hidden = true;
     section.innerHTML = '<div class="section-wrap artisan-dashboard"><div class="page-heading"><div><div class="eyebrow">بوابة الحرفي</div><h1>الطلبات <span>المطابقة لك.</span></h1><p>سجّل الدخول برقم الموبايل وكلمة المرور المسجلين بطلب انضمامك والمعتمد من الإدارة.</p></div></div><div class="artisan-auth-panel"><label class="form-label">رقم الموبايل<input id="artisan-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="01xxxxxxxxx أو +201xxxxxxxxx" required></label><label class="form-label">كلمة المرور<input id="artisan-password" type="password" autocomplete="current-password" minlength="8" placeholder="8 أحرف أو أرقام على الأقل" required></label><button class="button button-primary" id="artisan-login" type="button">دخول</button><button class="text-link artisan-forgot-password" id="artisan-forgot-password" type="button">نسيت كلمة المرور؟</button><button class="button button-light" id="artisan-signout" type="button" hidden>تسجيل الخروج</button></div><div id="artisan-orders" class="artisan-orders" hidden></div></div>';
+    createSupportLink(section.querySelector("#artisan-forgot-password"));
     document.querySelector("main").append(section);
     const link = document.createElement("a");
     link.className = "nav-link";
@@ -1323,10 +1361,29 @@
         }
         await appendProfessionalInquiry(match, order, card);
         if (match.status === "accepted" && order.status === "تم دفع العربون - قيد التنفيذ") {
+          const travel = document.createElement("button");
+          travel.type = "button";
+          travel.className = "button button-primary";
+          travel.textContent = localized("بدء التحرك للعميل");
+          travel.addEventListener("click", async () => {
+            const { error: travelError } = await supabaseClient.rpc("start_service_order_travel", {
+              p_match_id: match.id
+            });
+            if (travelError) {
+              console.error("Could not notify the customer that the professional is en route.", travelError);
+              showToast(travelError.message || "تعذر تحديث حالة التحرك.");
+              return;
+            }
+            showToast(localized("تم إشعار العميل بأنك في الطريق. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب."));
+            await loadMatches();
+          });
+          card.append(travel);
+        }
+        if (match.status === "accepted" && ["تم دفع العربون - قيد التنفيذ", "الحرفي في الطريق"].includes(order.status)) {
           const complete = document.createElement("button");
           complete.type = "button";
           complete.className = "button button-primary";
-          complete.textContent = "تم تنفيذ الخدمة";
+          complete.textContent = localized("تم تنفيذ الخدمة");
           complete.addEventListener("click", async () => {
             const { error: completionError } = await supabaseClient.rpc("complete_service_order", {
               match_id: match.id
@@ -1343,7 +1400,11 @@
         } else if (match.status === "accepted" && order.status === "بانتظار تأكيد العميل") {
           card.append(textElement("span", "record-status", "بانتظار تأكيد العميل واستلام الدفعة المتبقية."));
         } else if (match.status === "accepted") {
-          card.append(textElement("span", "record-status", `تم قبول الطلب · الوصول خلال ${order.estimated_arrival_minutes || "—"} دقيقة`));
+          card.append(textElement(
+            "span",
+            "record-status",
+            `${localized(order.status)} · الوصول خلال ${order.estimated_arrival_minutes || "—"} دقيقة`
+          ));
         } else {
           card.append(textElement("span", "record-status", "تم إسناد الطلب إلى حرفي آخر."));
         }
@@ -1569,10 +1630,6 @@
       }
       subscribeToMatches();
       await loadMatches();
-    });
-    byId("artisan-forgot-password").addEventListener("click", () => {
-      document.querySelector('[data-auth="login"]').click();
-      byId("auth-reset-toggle").click();
     });
     byId("artisan-phone").addEventListener("input", (event) => {
       event.currentTarget.setCustomValidity("");
@@ -1826,30 +1883,48 @@
       .replace(/\s+/g, " ");
   }
 
-  function findAvailableWorkers(trade, governorate, area) {
+  function calculateDistanceMeters(latitudeOne, longitudeOne, latitudeTwo, longitudeTwo) {
+    const radians = (degrees) => degrees * Math.PI / 180;
+    const latitudeDelta = radians(latitudeTwo - latitudeOne);
+    const longitudeDelta = radians(longitudeTwo - longitudeOne);
+    const haversine = Math.sin(latitudeDelta / 2) ** 2
+      + Math.cos(radians(latitudeOne)) * Math.cos(radians(latitudeTwo))
+      * Math.sin(longitudeDelta / 2) ** 2;
+    return 2 * 6371000 * Math.asin(Math.sqrt(Math.min(1, haversine)));
+  }
+
+  function findAvailableWorkers(trade, governorate, area, latitude, longitude, radiusMeters) {
     const targetGovernorate = normalizeLocation(governorate);
     const targetArea = normalizeLocation(area);
     return readStore(storageKeys.workers)
       .filter((worker) =>
         worker.status === "مقبول"
         && worker.trade === trade
-        && normalizeLocation(worker.governorate) === targetGovernorate
-        && normalizeLocation(worker.area) === targetArea
+        && (
+          latitude !== null && longitude !== null
+          && worker.locationLatitude != null && worker.locationLongitude != null
+            ? calculateDistanceMeters(
+              latitude,
+              longitude,
+              Number(worker.locationLatitude),
+              Number(worker.locationLongitude)
+            ) <= radiusMeters
+            : normalizeLocation(worker.governorate) === targetGovernorate
+              && normalizeLocation(worker.area) === targetArea
+        )
       )
       .map(({ id, name, trade: workerTrade }) => ({ id, name, trade: workerTrade }));
   }
 
-  async function findRemoteAvailableWorkers(trade, governorate, area) {
-    const { data, error } = await supabaseClient.from("available_professionals")
-      .select("id, name, trade, governorate, area")
-      .eq("trade", trade)
-      .eq("governorate", governorate)
-      .eq("area", area);
+  async function findRemoteAvailableWorkers(trackingToken) {
+    const { data, error } = await supabaseClient.rpc("get_available_professionals_for_order", {
+      p_tracking_token: trackingToken
+    });
     if (error) {
       console.error("Could not find approved professionals in Supabase.", error);
       return null;
     }
-    return (data || []).map(({ id, name, trade: workerTrade }) => ({ id, name, trade: workerTrade }));
+    return (data || []).map(({ id, name, trade }) => ({ id, name, trade }));
   }
 
   function showAvailabilityResult(workers, order) {
@@ -2132,6 +2207,9 @@
       config: { private: false }
     }).on("broadcast", { event: "order_updated" }, ({ payload }) => {
       if (payload?.status) renderTrackingUpdate(payload);
+      if (payload?.status === "الحرفي في الطريق") {
+        showToast(localized("الحرفي بدأ التحرك إليك. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب بالفعل؛ لا تدفع رسومًا إضافية."));
+      }
       if (payload?.payment_status === "deposit_confirmed") {
         showToast(localized("تم تأكيد عربونك بنجاح"));
       }
@@ -2361,6 +2439,10 @@
   function renderTrackingUpdate(payload) {
     const eta = payload?.estimated_arrival_minutes;
     const status = payload?.status || "قيد المراجعة";
+    if (status === "الحرفي في الطريق") {
+      byId("request-live-status").textContent = localized("الحرفي بدأ التحرك إليك. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب بالفعل؛ لا تدفع رسومًا إضافية.");
+      return;
+    }
     byId("request-live-status").textContent = payload?.payment_status === "deposit_confirmed"
       ? localized("تم تأكيد عربونك بنجاح")
       : document.documentElement.lang === "en"
@@ -2397,7 +2479,9 @@
     }
     currentTrackingOrder = data;
     renderTrackingUpdate(data);
-    byId("customer-tracking-status").textContent = data.payment_status === "deposit_confirmed"
+    byId("customer-tracking-status").textContent = data.status === "الحرفي في الطريق"
+      ? localized("الحرفي بدأ التحرك إليك. رسوم المنصة 10% محسوبة ضمن إجمالي الطلب بالفعل؛ لا تدفع رسومًا إضافية.")
+      : data.payment_status === "deposit_confirmed"
       ? localized("تم تأكيد عربونك بنجاح")
       : data.status;
     void refreshCustomerInquiry(trackingToken);
@@ -2699,6 +2783,7 @@
       address: data.get("address"),
       locationLatitude: data.get("location_latitude") ? Number(data.get("location_latitude")) : null,
       locationLongitude: data.get("location_longitude") ? Number(data.get("location_longitude")) : null,
+      matchingRadiusMeters: Number(data.get("matching_radius_meters")),
       proposedPrice: data.get("proposed_price") ? Number(data.get("proposed_price")) : null,
       details: data.get("details"),
       name: data.get("name"),
@@ -2706,7 +2791,14 @@
       paymentMethod: data.get("payment_method"),
       cashLocationDetails: data.get("cash_location_details"),
       areaSizeSqm: data.get("area_size_sqm") || null,
-      matchedWorkers: findAvailableWorkers(data.get("trade"), data.get("governorate"), area),
+      matchedWorkers: findAvailableWorkers(
+        data.get("trade"),
+        data.get("governorate"),
+        area,
+        data.get("location_latitude") ? Number(data.get("location_latitude")) : null,
+        data.get("location_longitude") ? Number(data.get("location_longitude")) : null,
+        Number(data.get("matching_radius_meters"))
+      ),
       status: "قيد المراجعة",
       createdAt: new Date().toISOString()
     };
@@ -2724,6 +2816,7 @@
         address: order.address,
         location_latitude: order.locationLatitude,
         location_longitude: order.locationLongitude,
+        matching_radius_meters: order.matchingRadiusMeters,
         proposed_price: order.proposedPrice,
         details: order.details || "",
         payment_method: order.paymentMethod,
@@ -2746,7 +2839,7 @@
         showToast("تعذر إرسال الطلب. راجع تفاصيل الخطأ الظاهرة أسفل النموذج.");
         return;
       }
-      order.matchedWorkers = await findRemoteAvailableWorkers(order.trade, order.governorate, order.area);
+      order.matchedWorkers = await findRemoteAvailableWorkers(order.trackingToken);
     } else {
       const orders = readStore(storageKeys.orders);
       orders.unshift(order);
@@ -2771,9 +2864,50 @@
     showAvailabilityResult(order.matchedWorkers, order);
   });
 
+  const artisanForm = byId("join-form");
+  const artisanAddressLabel = artisanForm.elements.address.closest(".form-label");
+  const artisanLocationTools = document.createElement("div");
+  artisanLocationTools.className = "request-location-tools artisan-location-tools";
+  const artisanLocationButton = document.createElement("button");
+  artisanLocationButton.type = "button";
+  artisanLocationButton.className = "text-link request-location-button";
+  artisanLocationButton.textContent = localized("حدّد موقع العمل عبر GPS (اختياري)");
+  const artisanLocationStatus = document.createElement("span");
+  artisanLocationStatus.setAttribute("aria-live", "polite");
+  artisanLocationStatus.textContent = localized("موقع العمل غير محدد؛ ستعتمد المطابقة على المنطقة.");
+  const artisanLatitudeInput = document.createElement("input");
+  artisanLatitudeInput.type = "hidden";
+  artisanLatitudeInput.name = "professional_location_latitude";
+  const artisanLongitudeInput = document.createElement("input");
+  artisanLongitudeInput.type = "hidden";
+  artisanLongitudeInput.name = "professional_location_longitude";
+  artisanLocationTools.append(artisanLocationButton, artisanLocationStatus, artisanLatitudeInput, artisanLongitudeInput);
+  artisanAddressLabel.after(artisanLocationTools);
+  artisanLocationButton.addEventListener("click", () => {
+    if (!navigator.geolocation) {
+      artisanLocationStatus.textContent = localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى.");
+      return;
+    }
+    artisanLocationButton.disabled = true;
+    artisanLocationStatus.textContent = localized("جارٍ تحديد موقعك...");
+    navigator.geolocation.getCurrentPosition(({ coords }) => {
+      artisanLatitudeInput.value = String(coords.latitude);
+      artisanLongitudeInput.value = String(coords.longitude);
+      artisanLocationStatus.textContent = localized("موقع العمل محفوظ وسيُستخدم لمطابقة الطلبات القريبة.");
+      artisanLocationButton.disabled = false;
+    }, (error) => {
+      console.error("Could not get the professional's work location.", error);
+      artisanLocationStatus.textContent = localized("تعذر الوصول للموقع. اكتب العنوان يدويًا أو حاول مرة أخرى.");
+      artisanLocationButton.disabled = false;
+    }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
+  });
+  artisanForm.addEventListener("reset", () => {
+    artisanLocationStatus.textContent = localized("موقع العمل غير محدد؛ ستعتمد المطابقة على المنطقة.");
+  });
+
   let artisanUserId = null;
 
-  byId("join-form").addEventListener("submit", async (event) => {
+  artisanForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const form = event.currentTarget;
     const phoneInput = form.elements.phone;
@@ -2836,6 +2970,12 @@
       governorate: data.get("governorate"),
       area: data.get("area") === "__other__" ? data.get("area_other") : data.get("area"),
       address: data.get("address"),
+      locationLatitude: data.get("professional_location_latitude")
+        ? Number(data.get("professional_location_latitude"))
+        : null,
+      locationLongitude: data.get("professional_location_longitude")
+        ? Number(data.get("professional_location_longitude"))
+        : null,
       idFile: data.get("id-image").name,
       payoutMethod: data.get("payout_method"),
       payoutAccount: data.get("payout_account"),
@@ -2868,6 +3008,8 @@
         governorate: worker.governorate,
         area: worker.area,
         address: worker.address,
+        location_latitude: worker.locationLatitude,
+        location_longitude: worker.locationLongitude,
         id_image_path: imagePath,
         portfolio_paths: portfolioPaths,
         payout_method: worker.payoutMethod,

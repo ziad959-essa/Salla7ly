@@ -76,6 +76,7 @@ create table if not exists public.service_orders (
   address text not null,
   location_latitude numeric(10, 7) check (location_latitude is null or location_latitude between -90 and 90),
   location_longitude numeric(10, 7) check (location_longitude is null or location_longitude between -180 and 180),
+  matching_radius_meters integer not null default 10000 check (matching_radius_meters between 1 and 10000),
   details text not null default '',
   proposed_price numeric(12, 2) check (proposed_price is null or proposed_price > 0),
   payment_method text check (payment_method in ('instapay', 'vodafone_cash', 'cash')),
@@ -177,6 +178,7 @@ alter table public.service_orders add column if not exists final_payment_status 
 alter table public.service_orders add column if not exists cash_location_details text;
 alter table public.service_orders add column if not exists location_latitude numeric(10, 7);
 alter table public.service_orders add column if not exists location_longitude numeric(10, 7);
+alter table public.service_orders add column if not exists matching_radius_meters integer not null default 10000;
 alter table public.service_orders add column if not exists proposed_price numeric(12, 2);
 alter table public.service_orders add column if not exists area_size_sqm numeric(10, 2);
 alter table public.service_orders add column if not exists accepted_professional_id uuid;
@@ -196,6 +198,9 @@ alter table public.service_orders add constraint service_orders_proposed_price_c
 alter table public.service_orders drop constraint if exists service_orders_location_coordinates_pair_check;
 alter table public.service_orders add constraint service_orders_location_coordinates_pair_check
   check ((location_latitude is null) = (location_longitude is null));
+alter table public.service_orders drop constraint if exists service_orders_matching_radius_meters_check;
+alter table public.service_orders add constraint service_orders_matching_radius_meters_check
+  check (matching_radius_meters between 1 and 10000);
 alter table public.service_orders drop constraint if exists service_orders_area_size_sqm_check;
 alter table public.service_orders add constraint service_orders_area_size_sqm_check
   check (area_size_sqm is null or area_size_sqm > 0);
@@ -218,6 +223,8 @@ create table if not exists public.professionals (
   governorate text not null,
   area text not null,
   address text not null,
+  location_latitude numeric(10, 7) check (location_latitude is null or location_latitude between -90 and 90),
+  location_longitude numeric(10, 7) check (location_longitude is null or location_longitude between -180 and 180),
   id_image_path text not null,
   portfolio_paths text[] not null default '{}',
   payout_method text check (payout_method in ('vodafone_cash', 'instapay', 'cash')),
@@ -233,6 +240,17 @@ alter table public.professionals add column if not exists payout_method text;
 alter table public.professionals add column if not exists payout_account text;
 alter table public.professionals add column if not exists presence_updated_at timestamptz;
 alter table public.professionals add column if not exists user_id uuid unique references auth.users (id) on delete set null;
+alter table public.professionals add column if not exists location_latitude numeric(10, 7);
+alter table public.professionals add column if not exists location_longitude numeric(10, 7);
+alter table public.professionals drop constraint if exists professionals_location_latitude_check;
+alter table public.professionals add constraint professionals_location_latitude_check
+  check (location_latitude is null or location_latitude between -90 and 90);
+alter table public.professionals drop constraint if exists professionals_location_longitude_check;
+alter table public.professionals add constraint professionals_location_longitude_check
+  check (location_longitude is null or location_longitude between -180 and 180);
+alter table public.professionals drop constraint if exists professionals_location_pair_check;
+alter table public.professionals add constraint professionals_location_pair_check
+  check ((location_latitude is null) = (location_longitude is null));
 alter table public.professionals drop constraint if exists professionals_payout_method_check;
 alter table public.professionals add constraint professionals_payout_method_check
   check (payout_method is null or payout_method in ('vodafone_cash', 'instapay', 'cash'));
@@ -593,6 +611,29 @@ begin
 end;
 $$;
 
+create or replace function public.coordinates_within_radius_meters(
+  p_latitude_one numeric,
+  p_longitude_one numeric,
+  p_latitude_two numeric,
+  p_longitude_two numeric,
+  p_radius_meters integer
+)
+returns boolean
+language sql
+immutable
+strict
+set search_path = ''
+as $$
+  select p_radius_meters between 1 and 10000
+    and 2 * 6371000 * asin(sqrt(least(
+      1.0,
+      power(sin(radians((p_latitude_two - p_latitude_one)::double precision / 2)), 2)
+      + cos(radians(p_latitude_one::double precision))
+      * cos(radians(p_latitude_two::double precision))
+      * power(sin(radians((p_longitude_two - p_longitude_one)::double precision / 2)), 2)
+    ))) <= p_radius_meters;
+$$;
+
 create or replace function public.match_service_order()
 returns trigger
 language plpgsql
@@ -608,8 +649,24 @@ begin
   from public.professionals p
   where p.status = 'مقبول'
     and p.trade = new.trade
-    and p.governorate = new.governorate
-    and p.area = new.area
+    and (
+      (
+        new.location_latitude is not null
+        and p.location_latitude is not null
+        and public.coordinates_within_radius_meters(
+          new.location_latitude,
+          new.location_longitude,
+          p.location_latitude,
+          p.location_longitude,
+          new.matching_radius_meters
+        )
+      )
+      or (
+        (new.location_latitude is null or p.location_latitude is null)
+        and p.governorate = new.governorate
+        and p.area = new.area
+      )
+    )
   on conflict (order_id, professional_id) do nothing;
   return new;
 end;
@@ -672,9 +729,25 @@ begin
     from public.service_orders o
     where o.status = 'قيد المراجعة'
       and o.trade = new.trade
-      and o.governorate = new.governorate
-      and o.area = new.area
       and o.accepted_professional_id is null
+      and (
+        (
+          o.location_latitude is not null
+          and new.location_latitude is not null
+          and public.coordinates_within_radius_meters(
+            o.location_latitude,
+            o.location_longitude,
+            new.location_latitude,
+            new.location_longitude,
+            o.matching_radius_meters
+          )
+        )
+        or (
+          (o.location_latitude is null or new.location_latitude is null)
+          and o.governorate = new.governorate
+          and o.area = new.area
+        )
+      )
     on conflict (order_id, professional_id) do nothing;
   end if;
   return new;
@@ -691,11 +764,27 @@ select o.id, p.id
 from public.service_orders o
 join public.professionals p
   on p.trade = o.trade
-  and p.governorate = o.governorate
-  and p.area = o.area
 where o.status = 'قيد المراجعة'
   and o.accepted_professional_id is null
   and p.status = 'مقبول'
+  and (
+    (
+      o.location_latitude is not null
+      and p.location_latitude is not null
+      and public.coordinates_within_radius_meters(
+        o.location_latitude,
+        o.location_longitude,
+        p.location_latitude,
+        p.location_longitude,
+        o.matching_radius_meters
+      )
+    )
+    or (
+      (o.location_latitude is null or p.location_latitude is null)
+      and p.governorate = o.governorate
+      and p.area = o.area
+    )
+  )
 on conflict (order_id, professional_id) do nothing;
 
 create or replace function public.claim_professional_account()
@@ -762,9 +851,52 @@ begin
   where id = selected_order
     and accepted_professional_id = professional
     and deposit_status = 'تم الدفع'
-    and status = 'تم دفع العربون - قيد التنفيذ';
+    and status in ('تم دفع العربون - قيد التنفيذ', 'الحرفي في الطريق');
   if not found then
     raise exception 'The deposit must be recorded before completing this service.';
+  end if;
+end;
+$$;
+
+create or replace function public.start_service_order_travel(p_match_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  professional uuid;
+  selected_order uuid;
+begin
+  select p.id into professional
+  from public.professionals p
+  where p.user_id = auth.uid() and p.status = 'مقبول';
+  if professional is null then
+    raise exception 'No approved professional account is linked.';
+  end if;
+
+  select o.id into selected_order
+  from public.service_order_matches m
+  join public.service_orders o on o.id = m.order_id
+  where m.id = p_match_id
+    and m.status = 'accepted'
+    and m.professional_id = professional
+    and o.accepted_professional_id = professional
+    and o.deposit_status = 'تم الدفع'
+    and o.status = 'تم دفع العربون - قيد التنفيذ'
+  for update of o;
+  if selected_order is null then
+    raise exception 'This service order cannot be marked as en route.';
+  end if;
+
+  update public.service_orders
+  set status = 'الحرفي في الطريق'
+  where id = selected_order
+    and accepted_professional_id = professional
+    and deposit_status = 'تم الدفع'
+    and status = 'تم دفع العربون - قيد التنفيذ';
+  if not found then
+    raise exception 'This service order is no longer ready for travel.';
   end if;
 end;
 $$;
@@ -1031,6 +1163,26 @@ create table if not exists public.site_settings (
   updated_at timestamptz not null default now()
 );
 
+create or replace function public.get_available_professionals_for_order(p_tracking_token uuid)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select coalesce(jsonb_agg(
+    jsonb_build_object('id', p.id, 'name', p.name, 'trade', p.trade)
+    order by p.name
+  ), '[]'::jsonb)
+  from public.service_orders o
+  join public.service_order_matches m on m.order_id = o.id
+  join public.professionals p on p.id = m.professional_id
+  where o.tracking_token = p_tracking_token
+    and o.status = 'قيد المراجعة'
+    and p.status = 'مقبول'
+    and p.presence_updated_at > now() - interval '75 seconds';
+$$;
+
 drop view if exists public.available_professionals;
 create view public.available_professionals
 with (security_invoker = true)
@@ -1131,6 +1283,7 @@ revoke all on function public.claim_professional_account() from public;
 revoke all on function public.accept_service_order(uuid, integer) from public;
 revoke all on function public.accept_service_order(uuid, integer) from anon, authenticated;
 revoke all on function public.complete_service_order(uuid) from public;
+revoke all on function public.start_service_order_travel(uuid) from public;
 revoke all on function public.submit_order_deposit(uuid, text, text) from public;
 revoke all on function public.confirm_order_delivery(uuid, text, text) from public;
 revoke all on function public.get_accepted_order_contact(uuid) from public;
@@ -1138,6 +1291,8 @@ revoke all on function public.get_admin_service_orders() from public;
 revoke all on function public.get_admin_professionals() from public;
 revoke all on function public.get_admin_chat_logs() from public;
 revoke all on function public.get_service_inquiry(uuid) from public;
+revoke all on function public.get_available_professionals_for_order(uuid) from public;
+revoke all on function public.coordinates_within_radius_meters(numeric, numeric, numeric, numeric, integer) from public, anon, authenticated;
 revoke all on function public.get_professional_inquiry(uuid) from public;
 revoke all on function public.filter_inquiry_message(text) from public;
 revoke all on function public.set_professional_presence(boolean) from public;
@@ -1149,6 +1304,7 @@ revoke all on function public.is_admin() from public;
 grant execute on function public.is_admin() to anon, authenticated;
 grant execute on function public.claim_professional_account() to authenticated;
 grant execute on function public.complete_service_order(uuid) to authenticated;
+grant execute on function public.start_service_order_travel(uuid) to authenticated;
 grant execute on function public.submit_order_deposit(uuid, text, text) to anon, authenticated;
 grant execute on function public.confirm_order_delivery(uuid, text, text) to anon, authenticated;
 grant execute on function public.get_accepted_order_contact(uuid) to authenticated;
@@ -1156,6 +1312,7 @@ grant execute on function public.get_admin_service_orders() to authenticated;
 grant execute on function public.get_admin_professionals() to authenticated;
 grant execute on function public.get_admin_chat_logs() to authenticated;
 grant execute on function public.get_service_inquiry(uuid) to anon, authenticated;
+grant execute on function public.get_available_professionals_for_order(uuid) to anon, authenticated;
 grant execute on function public.get_professional_inquiry(uuid) to authenticated;
 grant execute on function public.set_professional_presence(boolean) to authenticated;
 grant execute on function public.send_customer_inquiry_message(uuid, uuid, text) to anon, authenticated;
