@@ -38,6 +38,10 @@ img { display: block; max-width: 100%; }
 .brand-name small { display: block; margin-top: 3px; color: #89948c; font-family: "DM Sans", sans-serif; font-size: 8px; font-weight: 700; letter-spacing: 2.3px; }
 .main-nav { display: flex; align-items: center; gap: 36px; margin-inline-start: auto; margin-inline-end: 45px; }
 .nav-link { position: relative; padding: 27px 0; color: #627168; font-size: 13px; font-weight: 500; transition: color .2s; }
+.admin-mobile-link { display: none; }
+.portfolio-link { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 10px; border: 1px solid #ff795c; border-radius: 8px; background: rgba(255, 121, 92, .08); color: #5954c8; font-weight: 700; line-height: 1.2; text-align: center; }
+.portfolio-link small { color: #7d6670; font-size: 9px; font-weight: 600; white-space: nowrap; }
+.footer-links .portfolio-link { align-self: center; }
 .nav-orders-link { color: var(--green); font-weight: 700; white-space: nowrap; }
 .nav-orders-link > span { margin-inline-end: 4px; }
 .nav-link:hover, .nav-link.is-active { color: var(--green); }
@@ -338,6 +342,7 @@ dialog .toast { position: absolute; z-index: 99999; right: 50%; bottom: 16px; }
   .main-nav { position: absolute; top: 64px; right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; gap: 0; margin: 0; padding: 8px 20px 15px; border-bottom: 1px solid var(--line); background: var(--paper); box-shadow: 0 12px 20px rgba(20, 40, 28, .07); }
   .main-nav.is-open { display: flex; }
   .nav-link { padding: 11px 4px; }
+  .admin-mobile-link { display: block; }
   .nav-link.is-active::after { right: auto; bottom: 10px; left: auto; width: 3px; height: 20px; }
   .header-actions { gap: 10px; }
   .account-link { gap: 4px; font-size: 11px; }
@@ -701,6 +706,8 @@ html[data-theme="dark"] .form-card-heading h2,
 html[data-theme="dark"] .account-tab,
 html[data-theme="dark"] .details-dialog h2,
 html[data-theme="dark"] .auth-dialog h2 { color: #f4edf6; }
+html[data-theme="dark"] .portfolio-link { border-color: #ff987f; background: rgba(255, 121, 92, .12); color: #dedaff; }
+html[data-theme="dark"] .portfolio-link small { color: #d3c3cf; }
 html[data-theme="dark"] .brand-name small,
 html[data-theme="dark"] .hero-description,
 html[data-theme="dark"] .hero-notes,
